@@ -25,27 +25,20 @@ public sealed class ProxyConfiguration
 {
     public const string SectionName = "Proxy";
 
-    /// <summary>Auth server proxy endpoint.</summary>
-    public ProxyEndpointConfig Auth { get; set; } = new()
-    {
-        ListenPort = 9959,
-        RemoteHost = "127.0.0.1",
-        RemotePort = 9958,
-        Name = "Auth"
-    };
-
-    /// <summary>Game server proxy endpoint.</summary>
-    public ProxyEndpointConfig Game { get; set; } = new()
-    {
-        ListenPort = 5816,
-        RemoteHost = "127.0.0.1",
-        RemotePort = 5815,
-        Name = "Game"
-    };
+    /// <summary>All proxy endpoints to listen on.</summary>
+    public List<ProxyEndpointConfig> Endpoints { get; set; } = [];
 
     /// <summary>Directory to save packet log files.</summary>
     public string LogDirectory { get; set; } = "logs";
 
     /// <summary>Whether to output packet hex to console.</summary>
     public bool LogToConsole { get; set; } = true;
+
+    /// <summary>
+    /// Console output verbosity: "minimal", "normal", or "verbose".
+    /// minimal = session start/end + periodic summary only.
+    /// normal  = session start/end + per-packet one-liner (direction, size, no hex).
+    /// verbose = everything including hex dumps (for debugging).
+    /// </summary>
+    public string ConsoleVerbosity { get; set; } = "minimal";
 }

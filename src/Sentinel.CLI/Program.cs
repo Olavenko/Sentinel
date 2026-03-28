@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,6 +60,10 @@ try
 catch (OperationCanceledException)
 {
     // Normal shutdown
+}
+catch (SocketException)
+{
+    // Listener socket throws SocketException on shutdown — safe to ignore
 }
 finally
 {

@@ -21,7 +21,7 @@ namespace Sentinel.Network.Logging;
 public sealed class PacketLogger : IPacketLogger
 {
     private readonly ILogger<PacketLogger> _logger;
-    private readonly bool _logToConsole;
+    private readonly string _consoleVerbosity;
     private readonly string _logDirectory;
 
     private readonly ConcurrentDictionary<Guid, FileStream> _sessionFiles = new();
@@ -32,7 +32,7 @@ public sealed class PacketLogger : IPacketLogger
     public PacketLogger(IOptions<ProxyConfiguration> config, ILogger<PacketLogger> logger)
     {
         _logger = logger;
-        _logToConsole = config.Value.LogToConsole;
+        _consoleVerbosity = (config.Value.ConsoleVerbosity ?? "minimal").ToLowerInvariant();
         _logDirectory = config.Value.LogDirectory;
 
         Directory.CreateDirectory(_logDirectory);
@@ -47,13 +47,16 @@ public sealed class PacketLogger : IPacketLogger
         if (data.Length == 0)
             return;
 
-        // Write to binary file
+        // Write to binary file (always)
         var stream = GetOrCreateSessionFile(sessionId);
         await WriteBinaryEntryAsync(stream, direction, data, timestamp);
 
-        // Write to console
-        if (_logToConsole)
-            WriteConsoleEntry(sessionId, direction, data, timestamp);
+        // Write to console based on verbosity
+        if (_consoleVerbosity == "verbose")
+            WriteConsoleVerbose(sessionId, direction, data, timestamp);
+        else if (_consoleVerbosity == "normal")
+            WriteConsoleNormal(sessionId, direction, data, timestamp);
+        // "minimal" — no per-packet console output
     }
 
     public async ValueTask FlushAsync()
@@ -101,7 +104,8 @@ public sealed class PacketLogger : IPacketLogger
         await stream.WriteAsync(data);
     }
 
-    private static void WriteConsoleEntry(
+    /// <summary>"normal" verbosity — one line per packet, no hex.</summary>
+    private static void WriteConsoleNormal(
         Guid sessionId,
         PacketDirection direction,
         ReadOnlyMemory<byte> data,
@@ -111,12 +115,25 @@ public sealed class PacketLogger : IPacketLogger
         var sessionShort = sessionId.ToString()[..8];
         var time = timestamp.ToLocalTime().ToString("HH:mm:ss.fff");
 
-        // Summary line
+        Console.WriteLine($"[{time}] [{sessionShort}] {arrow}  {data.Length,6} bytes");
+    }
+
+    /// <summary>"verbose" verbosity — full hex dump (original behavior).</summary>
+    private static void WriteConsoleVerbose(
+        Guid sessionId,
+        PacketDirection direction,
+        ReadOnlyMemory<byte> data,
+        DateTimeOffset timestamp)
+    {
+        var arrow = direction == PacketDirection.ClientToServer ? "C→S" : "S→C";
+        var sessionShort = sessionId.ToString()[..8];
+        var time = timestamp.ToLocalTime().ToString("HH:mm:ss.fff");
+
         var sb = new StringBuilder(128);
         sb.Append($"[{time}] [{sessionShort}] {arrow}  {data.Length,6} bytes");
 
-        // First 32 bytes as hex preview
-        var previewLength = Math.Min(data.Length, 32);
+        // First 64 bytes as hex preview
+        var previewLength = Math.Min(data.Length, 64);
         var span = data.Span[..previewLength];
 
         sb.Append("   ");
@@ -127,7 +144,7 @@ public sealed class PacketLogger : IPacketLogger
                 sb.Append(' ');
         }
 
-        if (data.Length > 32)
+        if (data.Length > 64)
             sb.Append(" ...");
 
         Console.WriteLine(sb.ToString());

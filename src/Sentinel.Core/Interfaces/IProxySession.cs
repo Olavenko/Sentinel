@@ -23,6 +23,15 @@ public interface IProxySession : IAsyncDisposable
     /// <summary>Total bytes forwarded from server to client.</summary>
     long BytesSentToClient { get; }
 
+    /// <summary>Total packet chunks forwarded from client to server.</summary>
+    long PacketsSentToServer { get; }
+
+    /// <summary>Total packet chunks forwarded from server to client.</summary>
+    long PacketsSentToClient { get; }
+
+    /// <summary>Name of the endpoint this session belongs to (e.g. "GameServer").</summary>
+    string EndpointName { get; }
+
     /// <summary>
     /// Start bidirectional forwarding between client and server.
     /// Returns when either side disconnects or cancellation is requested.

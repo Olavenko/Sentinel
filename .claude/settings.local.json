@@ -1,7 +1,33 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(xxd -l 128 \"F:/TQ/Server.dat\")",
+      "Bash(xxd:*)",
+      "Bash(while read:*)",
+      "Bash(do echo:*)",
+      "Read(//f/Sentinel/**)",
+      "Bash(done)",
+      "Bash(pip install:*)",
+      "Bash(python3 -c \"import Cryptodome; print\\(Cryptodome.__file__\\)\")",
+      "Bash(pip list:*)",
+      "Bash(python3:*)",
+      "Bash(objdump -p F:/TQ/TQAnp.dll)",
+      "Bash(objdump -p F:/TQ/TQPlat.dll)",
+      "WebSearch",
+      "WebFetch(domain:conquerwiki.com)",
+      "WebFetch(domain:www.elitepvpers.com)",
+      "WebFetch(domain:www.darkfoxdeveloper.com)",
+      "WebFetch(domain:gitlab.com)",
+      "WebFetch(domain:cooldown.dev)",
+      "WebFetch(domain:conquer-online.github.io)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh api:*)",
+      "Bash(python:*)",
+      "Bash(mkdir -p F:/Sentinel/src/Sentinel.Hook)",
+      "Bash(mkdir -p F:/Sentinel/src/Sentinel.Loader)",
+      "Bash(ls F:/Sentinel/src/Sentinel.Hook/*.cpp F:/Sentinel/src/Sentinel.Hook/*.bat F:/Sentinel/src/Sentinel.Hook/build/*.dll)",
+      "Bash(ls F:/Sentinel/src/Sentinel.Loader/*.cs F:/Sentinel/src/Sentinel.Loader/*.csproj)"
     ]
   }
 }

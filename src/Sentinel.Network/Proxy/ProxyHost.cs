@@ -6,12 +6,12 @@ using Sentinel.Core.Models;
 namespace Sentinel.Network.Proxy;
 
 /// <summary>
-/// Orchestrates both proxy servers (auth + game) and manages their lifecycle.
+/// Orchestrates all proxy servers and manages their lifecycle.
 /// </summary>
 public sealed class ProxyHost : IAsyncDisposable
 {
-    private readonly ProxyServer _authServer;
-    private readonly ProxyServer _gameServer;
+    private readonly List<ProxyServer> _servers;
+    private readonly string _consoleVerbosity;
     private readonly ILogger<ProxyHost> _logger;
 
     public ProxyHost(
@@ -22,30 +22,81 @@ public sealed class ProxyHost : IAsyncDisposable
         ILogger<ProxyHost> logger)
     {
         var cfg = config.Value;
-        _authServer = new ProxyServer(cfg.Auth, packetLogger, sessionLogger, serverLogger);
-        _gameServer = new ProxyServer(cfg.Game, packetLogger, sessionLogger, serverLogger);
+        _servers = cfg.Endpoints
+            .Select(ep => new ProxyServer(ep, packetLogger, sessionLogger, serverLogger))
+            .ToList();
+        _consoleVerbosity = (cfg.ConsoleVerbosity ?? "minimal").ToLowerInvariant();
         _logger = logger;
     }
 
     /// <summary>
-    /// Start both auth and game proxy servers.
+    /// Start all proxy servers.
     /// Returns when cancellation is requested.
     /// </summary>
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Sentinel proxy starting...");
+        _logger.LogInformation("Sentinel proxy starting ({Count} endpoints)...", _servers.Count);
 
-        var authTask = _authServer.StartAsync(cancellationToken);
-        var gameTask = _gameServer.StartAsync(cancellationToken);
+        // Start periodic summary if minimal verbosity
+        Task? summaryTask = null;
+        if (_consoleVerbosity == "minimal")
+            summaryTask = RunPeriodicSummaryAsync(cancellationToken);
 
-        await Task.WhenAll(authTask, gameTask);
+        var tasks = _servers.Select(s => s.StartAsync(cancellationToken));
+        await Task.WhenAll(tasks);
+
+        // Wait for summary to stop cleanly
+        if (summaryTask is not null)
+            try { await summaryTask; } catch (OperationCanceledException) { }
 
         _logger.LogInformation("Sentinel proxy stopped");
     }
 
+    private async Task RunPeriodicSummaryAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                foreach (var server in _servers)
+                {
+                    foreach (var session in server.ActiveSessions)
+                    {
+                        if (!session.IsActive) continue;
+
+                        Console.WriteLine(
+                            "[{0}] {1}  ↑{2} pkts ({3})  ↓{4} pkts ({5})",
+                            session.EndpointName,
+                            session.Id.ToString()[..8],
+                            session.PacketsSentToServer,
+                            FormatBytes(session.BytesSentToServer),
+                            session.PacketsSentToClient,
+                            FormatBytes(session.BytesSentToClient));
+                    }
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal shutdown
+        }
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        return bytes switch
+        {
+            < 1024 => $"{bytes} B",
+            < 1024 * 1024 => $"{bytes / 1024.0:F1} KB",
+            _ => $"{bytes / (1024.0 * 1024.0):F1} MB"
+        };
+    }
+
     public async ValueTask DisposeAsync()
     {
-        await _authServer.DisposeAsync();
-        await _gameServer.DisposeAsync();
+        foreach (var server in _servers)
+            await server.DisposeAsync();
     }
 }

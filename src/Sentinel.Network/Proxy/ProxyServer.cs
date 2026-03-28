@@ -61,6 +61,11 @@ public sealed class ProxyServer : IProxyServer
         {
             // Normal shutdown
         }
+        catch (SocketException) when (cancellationToken.IsCancellationRequested)
+        {
+            // AcceptTcpClientAsync can throw SocketException (10054) instead of
+            // OperationCanceledException when the listener is stopped during shutdown
+        }
         finally
         {
             IsListening = false;
@@ -70,15 +75,15 @@ public sealed class ProxyServer : IProxyServer
     private async Task HandleClientAsync(TcpClient client, CancellationToken ct)
     {
         var clientEndpoint = client.Client.RemoteEndPoint?.ToString() ?? "unknown";
-        TcpClient? server = null;
+        ProxySession? session = null;
 
         try
         {
             // Connect to the real server
-            server = new TcpClient();
+            var server = new TcpClient();
             await server.ConnectAsync(_config.RemoteHost, _config.RemotePort, ct);
 
-            var session = new ProxySession(client, server, _packetLogger, _sessionLogger, _config.Name);
+            session = new ProxySession(client, server, _packetLogger, _sessionLogger, _config.Name);
 
             _sessions.TryAdd(session.Id, session);
             SessionStarted?.Invoke(session);
@@ -107,13 +112,17 @@ public sealed class ProxyServer : IProxyServer
         }
         finally
         {
-            if (server is not null)
+            // Session owns both TcpClients — let it handle disposal
+            if (session is not null)
             {
-                try { server.Close(); } catch { }
-                server.Dispose();
+                await session.DisposeAsync();
             }
-            try { client.Close(); } catch { }
-            client.Dispose();
+            else
+            {
+                // Session was never created — clean up the client we accepted
+                try { client.Close(); } catch { }
+                client.Dispose();
+            }
         }
     }
 
@@ -122,15 +131,23 @@ public sealed class ProxyServer : IProxyServer
         _sessions.TryRemove(session.Id, out _);
         SessionEnded?.Invoke(session);
 
+        var sessionId = session.Id.ToString()[..8];
+
         if (reason is not null)
         {
-            _logger.LogWarning("[{Name}] Session {Id:N8} disconnected — {Reason}",
-                _config.Name, session.Id.ToString()[..8], reason.Message);
+            _logger.LogWarning("[{Name}] Session {Id} disconnected — {Reason}",
+                _config.Name, sessionId, reason.Message);
+        }
+        else if (session.BytesSentToServer == 0 && session.BytesSentToClient == 0)
+        {
+            // Probe/keepalive connections — reduce log noise
+            _logger.LogDebug("[{Name}] Session {Id} disconnected — 0 bytes (probe)",
+                _config.Name, sessionId);
         }
         else
         {
-            _logger.LogInformation("[{Name}] Session {Id:N8} disconnected — C→S: {ToServer} bytes, S→C: {ToClient} bytes",
-                _config.Name, session.Id.ToString()[..8],
+            _logger.LogInformation("[{Name}] Session {Id} disconnected — C→S: {ToServer} bytes, S→C: {ToClient} bytes",
+                _config.Name, sessionId,
                 session.BytesSentToServer, session.BytesSentToClient);
         }
     }

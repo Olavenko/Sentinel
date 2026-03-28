@@ -4,6 +4,7 @@
     <Project Path="src/Sentinel.Core/Sentinel.Core.csproj" />
     <Project Path="src/Sentinel.Crypto/Sentinel.Crypto.csproj" />
     <Project Path="src/Sentinel.Network/Sentinel.Network.csproj" />
+    <Project Path="src/Sentinel.Loader/Sentinel.Loader.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Sentinel.Network.Tests/Sentinel.Network.Tests.csproj" />
