@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,11 @@ using Sentinel.Network.Logging;
 using Sentinel.Network.Proxy;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+// Ensure appsettings.json is found next to the executable,
+// not in whatever directory `dotnet run` was invoked from.
+builder.Configuration.SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 
 // Bind proxy configuration from appsettings.json
 builder.Services.Configure<ProxyConfiguration>(
