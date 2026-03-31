@@ -1,0 +1,26 @@
+[*] Frida v13 — direction mapping for BF_cfb64_encrypt — 2026-03-30T04:35:55.773Z
+[*] All hooks installed! Login and play briefly to map enc direction to session IVs.
+
+[HANDSHAKE] ENTER ecx=0x21c9770 arg0=0x178dff08 arg1=0x1a09080 arg2=0x0
+[HANDSHAKE] LEAVE retval=0x0
+[HANDSHAKE] candidate=ecx socket=0x21c9770 cipher_ctx=0x21ca778 p_array=0x21ca7b8 p0=0x00000000 enabled=0x44 dec_num=2323709346 enc_num=4116798504 server_ivec=9d2b3e2885dc978e client_ivec=09e6bb8f516cfe43
+[HANDSHAKE] selected ecx IVs server_ivec=9d2b3e2885dc978e client_ivec=09e6bb8f516cfe43
+[HANDSHAKE] candidate=arg0 socket=0x178dff08 cipher_ctx=0x178e0f10 p_array=0x178e0f50 p0=0x00000000 enabled=0x00 dec_num=0 enc_num=0 server_ivec=0000000000000000 client_ivec=0000000000000000
+[HANDSHAKE] ENTER ecx=0x21c9770 arg0=0x178dff08 arg1=0x1a09080 arg2=0x0
+[HANDSHAKE] LEAVE retval=0x0
+[HANDSHAKE] candidate=ecx socket=0x21c9770 cipher_ctx=0x21ca778 p_array=0x21ca7b8 p0=0x00000000 enabled=0x44 dec_num=2323709346 enc_num=4116798504 server_ivec=9d2b3e2885dc978e client_ivec=09e6bb8f516cfe43
+[HANDSHAKE] selected ecx IVs server_ivec=9d2b3e2885dc978e client_ivec=09e6bb8f516cfe43
+[HANDSHAKE] candidate=arg0 socket=0x178dff08 cipher_ctx=0x178e0f10 p_array=0x178e0f50 p0=0x00000000 enabled=0x00 dec_num=0 enc_num=0 server_ivec=0000000000000000 client_ivec=0000000000000000
+[HANDSHAKE] ENTER ecx=0x21c9770 arg0=0x178dff08 arg1=0x1a09080 arg2=0x0
+[*] Got BF_KEY: 0x178de5a0 P0=0xdb298a75
+[*] Handshake IVs captured: server=9d2b3e2885dc978e client=09e6bb8f516cfe43
+[BF_CALL] #0 ENTER enc=0 len=15 num_before=0 ivec_now=0000000000000000 match=NEITHER in[0:8]=b22db4e497877c0f out_before[0:8]=0000000000000000
+[BF_CALL] #0 LEAVE enc=0 len=15 ivec_now=0000000000000000 match=NEITHER out_after[0:8]=0ea7340128376812
+[BF_CALL] #1 ENTER enc=0 len=330 num_before=7 ivec_now=aa16820eee490d39 match=NEITHER in[0:8]=2d63206ed9cb2d99 out_before[0:8]=0000000000000000
+[BF_CALL] #1 LEAVE enc=0 len=330 ivec_now=aa16820eee490d39 match=NEITHER out_after[0:8]=140000004754c7f4
+[BF_CALL] #2 ENTER enc=1 len=199 num_before=0 ivec_now=0000000000000000 match=NEITHER in[0:8]=bbe8e8aa916280c0 out_before[0:8]=0000000000000000
+[BF_CALL] #2 LEAVE enc=1 len=199 ivec_now=0000000000000000 match=NEITHER out_after[0:8]=0762684f2ed294dd
+[HANDSHAKE] LEAVE retval=0x3
+[HANDSHAKE] candidate=ecx socket=0x21c9770 cipher_ctx=0x21ca778 p_array=0x21ca7b8 p0=0x00000000 enabled=0x44 dec_num=2323709346 enc_num=4116798504 server_ivec=9d2b3e2885dc978e client_ivec=09e6bb8f516cfe43
+[HANDSHAKE] selected ecx IVs server_ivec=9d2b3e2885dc978e client_ivec=09e6bb8f516cfe43
+[HANDSHAKE] candidate=arg0 socket=0x178dff08 cipher_ctx=0x178e0f10 p_array=0x178e0f50 p0=0x00000000 enabled=0x00 dec_num=0 enc_num=0 server_ivec=0000000000000000 client_ivec=0000000000000000

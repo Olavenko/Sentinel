@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sentinel.Network\Sentinel.Network.csproj" />
     <ProjectReference Include="..\..\src\Sentinel.Core\Sentinel.Core.csproj" />
+    <ProjectReference Include="..\..\src\Sentinel.Crypto\Sentinel.Crypto.csproj" />
   </ItemGroup>
 
 </Project>

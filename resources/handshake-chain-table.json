@@ -1,0 +1,10 @@
+{
+  "_comment": "BF_encrypt chain table for CO 7xxx handshake cipher. Each entry is input->output for one BF_encrypt call. Extend this table by running the Frida keystream-capture script against Conquer.exe.",
+  "_frida_script": "tools/frida/capture-keystream.js",
+  "0000000000000000": "bc8a80e5bfb0141d",
+  "bc8a80e5bfb0141d": "694d6035a12e9daf",
+  "694d6035a12e9daf": "ec3699e9846441a2",
+  "ec3699e9846441a2": "6acf349c4aa71eac",
+  "db09701df591fa9b": "38ef9f8691d4c8f4",
+  "4c667e70cca6b2aa": "96cbb7d3e9067970"
+}

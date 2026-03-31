@@ -24,6 +24,12 @@ public interface ICipher : IDisposable
     void Encrypt(Span<byte> data);
 
     /// <summary>
+    /// Set the initialization vector for CFB/CBC modes.
+    /// Resets the streaming counter to 0.
+    /// </summary>
+    void SetIv(ReadOnlySpan<byte> iv);
+
+    /// <summary>
     /// Reset cipher state (counters, IVs) without changing the key.
     /// </summary>
     void Reset();

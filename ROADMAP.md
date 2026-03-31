@@ -6,7 +6,7 @@ Each phase produces something runnable and testable. Each phase includes learnin
 
 **Reference codebase:** The original gProxy (`gProxy-master/`) contains complete protocol documentation for CO patch 5xxx. This serves as our Rosetta Stone — not code to port, but knowledge to compare against.
 
-Last updated: 2026-03-28 (session 2)
+Last updated: 2026-03-28 (session 3)
 
 ---
 
@@ -144,25 +144,35 @@ cd src/Sentinel.Hook && build.bat
 
 # Run the loader (as Administrator)
 dotnet run --project src/Sentinel.Loader -- "F:\TQ\play.exe" "path\to\SentinelHook.dll"
+
+dotnet run --project src/Sentinel.Loader -- "F:\TQ\Play.exe" "src\Sentinel.Hook\build\SentinelHook.dll"
+
+dotnet run --project src/Sentinel.CLI
 ```
 
-### Step 10: Integration Test — IN PROGRESS
+### Step 10: Integration Test — DONE (2026-03-28 session 2)
 
-Connect a real CO client through the proxy via Hook + Loader and verify end-to-end.
+CO client connected through the proxy via Hook + Loader. All traffic captured successfully.
 
-Infrastructure complete:
 - [x] `appsettings.json` updated with real CO server IPs and ports
 - [x] Hook DLL redirects client connections to loopback
 - [x] Loader handles Play.exe → Conquer.exe two-stage launch
 - [x] Console output is readable (minimal verbosity)
+- [x] Client logs in and enters game world without disconnection
+- [x] Proxy handles client/server disconnect gracefully
+- [x] Multiple simultaneous sessions work
+- [x] Binary log files captured in `logs/`
 
-Still to verify:
-- [ ] Client logs in and enters game world without disconnection
-- [ ] Walking, fighting, chatting all work without lag
-- [ ] Proxy handles client/server disconnect gracefully
-- [ ] Multiple simultaneous sessions work
-- [ ] Binary log files captured in `logs/`
-- [ ] Proxy runs 30+ minutes without memory growth
+**Captures collected (`F:\Sentinel\logs\`):**
+
+| File | Size | Content |
+|------|------|---------|
+| `session_0e614de1...` | 137 KB | In-game traffic (login + world) |
+| `session_72386020...` | 46 KB | Auth/login exchange |
+| `session_3495ebce...` | 868 B | Version check / probe |
+| `session_36dea030...` | 868 B | Version check / probe |
+
+These captures are the input for Phase 2 reverse engineering.
 
 **How to run (full stack):**
 ```bash
@@ -188,7 +198,7 @@ dotnet run --project src/Sentinel.Loader -- "F:\TQ\play.exe"
 
 ---
 
-## Phase 2 — Capture, Analysis & Reverse Engineering — NOT STARTED
+## Phase 2 — Capture, Analysis & Reverse Engineering — IN PROGRESS (blocked)
 
 ### Goal
 
@@ -225,6 +235,144 @@ Collect gameplay packet captures, build analysis tooling, and reverse engineer t
 ### Deliverable
 
 `PROTOCOL.md` — confirmed encryption, handshake diagram, initial packet ID map, field offset notes.
+
+---
+
+### Completed this session (2026-03-28 session 3)
+
+#### GhidraMCP Setup — DONE
+
+Connected GhidraMCP to Claude Code. Bridge: Claude Code (MCP client) → Python MCP server → HTTP REST → Ghidra Java plugin → loaded binary. Plugin runs on `localhost:8080`.
+
+#### Conquer.exe Analysis — DONE (partial, blocked by Code Virtualizer)
+
+- Binary is protected by **Code Virtualizer** (Oreans) — `.vlizer` PE section present
+- Networking and crypto routines are inside the virtualised region; Ghidra decompilation of those functions produces VM interpreter code, not original logic
+- Unprotected regions (startup, config, UI) decompile normally
+- Ghidra-only RE of the handshake is impractical without a devirtualiser
+
+#### TqNDProtect.dll Analysis — DONE
+
+- Confirmed **anti-cheat DLL only** (not encryption/networking)
+- Exports: `NdProtect_Init`, `NdProtect_Check`, `NdProtect_Heartbeat`, `NdProtect_Report`
+- Imports: `CreateToolhelp32Snapshot`, `Process32First/Next`, `OpenProcess`, `ReadProcessMemory`
+- No cipher constants, no DH/BigNum imports — irrelevant to Phase 3
+
+#### Packet Capture Analysis — DONE
+
+Four dedicated gameplay sessions captured and analysed (idle 31 KB, walk 37 KB, attack 78 KB, chat 28 KB).
+
+**Encryption confirmed: Blowfish CFB64**
+- Separate streaming cipher state per direction
+- `BF_cfb64_encrypt` (OpenSSL), segment size = 64 bits, initial IV = 8 zero bytes
+
+**Key exchange: DH, session-unique**
+- Hardcoded key `"DR654dt34trg4UI6"` does NOT decrypt traffic — DH is active
+- Trial decryption with the hardcoded key failed on all four sessions
+
+**Handshake packet (pkt#0 C→S, 276 bytes, PLAINTEXT, type 0x0A02)**
+- First 4 bytes `14 01 02 0a` fixed in all sessions (CO header)
+- 68 variable bytes (session token from auth server)
+- 156-byte fixed block at bytes[120:276]: DH prime P hardcoded in CO client binary
+- Value: `766e4991e07393fc…02dfd6a0`
+
+**Auth server seed:** 8-byte S→C, bytes[0:4] = `c5 48 69 12` fixed, bytes[4:8] variable (TQ cipher seed)
+
+**Packet size fingerprints (key findings):**
+
+| Packet | Direction | Size(s) | Evidence |
+|--------|-----------|---------|----------|
+| Heartbeat | both | **20** | All sessions, rate ∝ time |
+| Walk command | C→S | **30, 31** | Walk+attack, absent in idle |
+| Action/combined | C→S | **56** | Walk×33, attack×43, chat×11 |
+| Attack command | C→S | **42, 43** | Attack-only (×20, ×15) |
+| Chat (short) | C→S | **37** | Chat-only |
+| Chat (long) | C→S | **94** | Chat-only |
+| DH auth token | C→S | **276** | ×1 per session, PLAINTEXT |
+| Login credentials | C→S | **357** | ×1 per session |
+| World entry | C→S | **564** | ×1 per session |
+| Hit/miss event | S→C | **26** | Attack×112 — highest-freq combat packet |
+| Combat result | S→C | **48** | Attack×44 vs idle×2 |
+| Kill/skill effect | S→C | **57** | Attack-only ×23 |
+| Entity position | S→C | **47** | Walk×33, attack×43 |
+| Server config | S→C | **524** | ×1 per session |
+
+Full tables in `reports/session_02_report.md`.
+
+---
+
+### ⚠ Blocker: DH MITM Required
+
+**All remaining Phase 2 work (type IDs, field offsets, PROTOCOL.md) requires plaintext packets.**
+
+Sentinel must perform a DH man-in-the-middle: intercept the DH handshake, compute two shared secrets (one with the client, one with the server), and maintain four Blowfish states to decrypt/re-encrypt both directions transparently.
+
+**Decision: implement DH MITM as Step 11 (Phase 3 early) before continuing Phase 2 analysis.**
+
+---
+
+### Remaining (unblocked after Step 11)
+
+- [ ] `tools/Sentinel.PacketViewer/`
+- [ ] Pattern matcher (5xxx IDs in 7xxx traffic)
+- [ ] Capture scenarios: pickup, NPC, map change, equip, death
+- [ ] `PROTOCOL.md`
+
+---
+
+### Step 11: DH MITM Implementation — IN PROGRESS (Phase 3 early, unblocks Phase 2)
+
+Implement Diffie-Hellman man-in-the-middle in `ProxySession` and `Sentinel.Crypto` so Sentinel can decrypt all game server traffic in real time.
+
+**Architecture:**
+
+```
+CO Client ◀──────────────────────────── Sentinel ────────────────────────────▶ Real Server
+          SharedSecret_A (Client↔Proxy)           SharedSecret_B (Proxy↔Server)
+          BF_C2S_A  BF_S2C_A                      BF_C2S_B  BF_S2C_B
+```
+
+**What to build:**
+
+| File | What It Does |
+|------|-------------|
+| `Sentinel.Crypto/DiffieHellman.cs` | Wrap `System.Security.Cryptography.DH` or BouncyCastle `DHParameters`. Parse P/G from the server's handshake packet. Generate ephemeral keypair. Compute shared secret. |
+| `Sentinel.Crypto/BlowfishCfb64Cipher.cs` | Concrete `ICipher` — Blowfish CFB64 via BouncyCastle. Stateful streaming. |
+| `Sentinel.Crypto/TqKeyExchange.cs` | Concrete `IKeyExchange` — parses `CHandshake` from S→C, rebuilds it with a new pubkey for the client, parses `CHandshakeReply` from C→S, rebuilds it with a new pubkey for the server. Sets per-direction IVs from `ClientIvec` / `ServerIvec` in the handshake. |
+| `Sentinel.Network/Proxy/ProxySession.cs` | After handshake completes: decrypt each inbound chunk before logging, re-encrypt before forwarding. Four Blowfish states total (C→S×2, S→C×2). |
+
+**Handshake packet format (from gProxy reference):**
+
+S→C `CHandshake` (server → client, unencrypted with initial key):
+```
+ReadBytes(11)   — random header
+Read<Int32>     — TQSize
+ReadBuffer()    — NonStaticRandomData  (2-byte len prefix)
+ReadBuffer()    — ClientIvec           (8 bytes)
+ReadBuffer()    — ServerIvec           (8 bytes)
+ReadBuffer()    — P (DH prime)
+ReadBuffer()    — G (DH generator)
+ReadBuffer()    — Server DH pubkey
+ReadBytes(8)    — TQServer
+```
+
+C→S `CHandshakeReply` (client → server, encrypted with initial key):
+```
+ReadBytes(11)   — header
+ReadBuffer()    — Data
+ReadBuffer()    — Client DH pubkey
+ReadBytes(8)    — TQClient
+```
+
+IV assignment after `CompleteDH()`:
+```
+Proxy encrypt to client  IV = ClientIvec
+Proxy decrypt from client IV = ClientIvec
+Proxy encrypt to server  IV = ServerIvec
+Proxy decrypt from server IV = ServerIvec
+```
+
+**NuGet to add:** `BouncyCastle.Cryptography` to `Sentinel.Crypto`
 
 ---
 
@@ -372,4 +520,8 @@ src/Sentinel.Loader/               ← NEW (session 2) — .NET 10 DLL injector
 
 tests/Sentinel.Network.Tests/
     (empty — ready for tests)
+
+reports/
+├── session_02_report.md    ← GhidraMCP setup, Conquer.exe/TqNDProtect findings,
+                               full packet capture analysis, DH MITM blocker
 ```

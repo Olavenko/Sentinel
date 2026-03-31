@@ -8,5 +8,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Sentinel.Network.Tests/Sentinel.Network.Tests.csproj" />
+    <Project Path="tests/Sentinel.Crypto.Tests/Sentinel.Crypto.Tests.csproj" />
   </Folder>
 </Solution>

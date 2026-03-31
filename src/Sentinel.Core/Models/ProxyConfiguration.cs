@@ -16,6 +16,9 @@ public sealed class ProxyEndpointConfig
 
     /// <summary>Human-readable name for logging (e.g. "Auth", "Game").</summary>
     public string Name { get; set; } = "";
+
+    /// <summary>Whether to perform DH MITM on this endpoint to decrypt traffic.</summary>
+    public bool EnableMitm { get; set; }
 }
 
 /// <summary>
@@ -33,6 +36,13 @@ public sealed class ProxyConfiguration
 
     /// <summary>Whether to output packet hex to console.</summary>
     public bool LogToConsole { get; set; } = true;
+
+    /// <summary>
+    /// Path to the BF_encrypt chain table JSON file used for handshake decryption.
+    /// Relative to the application working directory.
+    /// Extend the table by running tools/frida/capture-keystream.js against the game process.
+    /// </summary>
+    public string HandshakeChainTablePath { get; set; } = "resources/handshake-chain-table.json";
 
     /// <summary>
     /// Console output verbosity: "minimal", "normal", or "verbose".

@@ -8,6 +8,12 @@ namespace Sentinel.Crypto.Interfaces;
 public interface IKeyExchange : IDisposable
 {
     /// <summary>
+    /// Initialize the key exchange with parameters (e.g. DH prime and generator).
+    /// Must be called before GeneratePublicKey().
+    /// </summary>
+    void Initialize(ReadOnlySpan<byte> prime, ReadOnlySpan<byte> generator);
+
+    /// <summary>
     /// Generate our public key to send to the remote side.
     /// </summary>
     byte[] GeneratePublicKey();

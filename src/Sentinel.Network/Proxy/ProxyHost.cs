@@ -2,6 +2,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sentinel.Core.Interfaces;
 using Sentinel.Core.Models;
+using Sentinel.Crypto;
+using Sentinel.Crypto.Interfaces;
 
 namespace Sentinel.Network.Proxy;
 
@@ -22,8 +24,22 @@ public sealed class ProxyHost : IAsyncDisposable
         ILogger<ProxyHost> logger)
     {
         var cfg = config.Value;
+
+        // Load chain table once; all MITM-enabled sessions share the same read-only table.
+        var chainTable = ChainTableLoader.TryLoadFromFile(cfg.HandshakeChainTablePath);
+        if (chainTable.Count == 0 && cfg.Endpoints.Any(e => e.EnableMitm))
+            logger.LogWarning(
+                "MITM is enabled on at least one endpoint but the chain table at '{Path}' " +
+                "is empty or missing. Handshake decryption will fail — run the Frida " +
+                "keystream-capture script to populate it.",
+                cfg.HandshakeChainTablePath);
+
+        Func<bool, ICipher>? factory = chainTable.Count > 0
+            ? encrypting => new ChainTableCfb64Cipher(chainTable, encrypting)
+            : null;
+
         _servers = cfg.Endpoints
-            .Select(ep => new ProxyServer(ep, packetLogger, sessionLogger, serverLogger))
+            .Select(ep => new ProxyServer(ep, packetLogger, sessionLogger, serverLogger, factory))
             .ToList();
         _consoleVerbosity = (cfg.ConsoleVerbosity ?? "minimal").ToLowerInvariant();
         _logger = logger;

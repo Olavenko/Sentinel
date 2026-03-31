@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using Sentinel.Core.Interfaces;
 using Sentinel.Core.Models;
+using Sentinel.Crypto;
+using Sentinel.Crypto.Interfaces;
 
 namespace Sentinel.Network.Proxy;
 
@@ -17,6 +19,7 @@ public sealed class ProxyServer : IProxyServer
     private readonly IPacketLogger _packetLogger;
     private readonly ILogger<ProxySession> _sessionLogger;
     private readonly ILogger<ProxyServer> _logger;
+    private readonly Func<bool, ICipher>? _handshakeCipherFactory;
 
     private readonly ConcurrentDictionary<Guid, IProxySession> _sessions = new();
     private TcpListener? _listener;
@@ -31,12 +34,14 @@ public sealed class ProxyServer : IProxyServer
         ProxyEndpointConfig config,
         IPacketLogger packetLogger,
         ILogger<ProxySession> sessionLogger,
-        ILogger<ProxyServer> logger)
+        ILogger<ProxyServer> logger,
+        Func<bool, ICipher>? handshakeCipherFactory = null)
     {
         _config = config;
         _packetLogger = packetLogger;
         _sessionLogger = sessionLogger;
         _logger = logger;
+        _handshakeCipherFactory = handshakeCipherFactory;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -83,7 +88,9 @@ public sealed class ProxyServer : IProxyServer
             var server = new TcpClient();
             await server.ConnectAsync(_config.RemoteHost, _config.RemotePort, ct);
 
-            session = new ProxySession(client, server, _packetLogger, _sessionLogger, _config.Name);
+            session = new ProxySession(
+                client, server, _packetLogger, _sessionLogger,
+                _config.Name, _config.EnableMitm, _handshakeCipherFactory);
 
             _sessions.TryAdd(session.Id, session);
             SessionStarted?.Invoke(session);

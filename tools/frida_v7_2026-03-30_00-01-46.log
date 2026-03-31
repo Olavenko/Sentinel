@@ -1,0 +1,80 @@
+[*] Frida v7 — BF IO Capture — 2026-03-29T22:01:46.972Z
+[*] Hooked BF_cfb64_encrypt
+[*] All hooks ready! Login now.
+
+[HS] Handshake called
+[HS] Returned: 0
+[HS] Handshake called
+[HS] Returned: 0
+[HS] Handshake called
+
+[IO] ===== CAPTURE #1 (DECRYPT) =====
+[IO] length: 15
+[IO] encrypt: 0
+[IO] num: 0
+[IO] BF_KEY ptr: 0x2059e5a0
+[IO] IV_BEFORE: 00 00 00 00 00 00 00 00
+[IO] INPUT (15/15): db 09 70 1d f5 91 fa 9b a7 aa 14 d2 90 d4 c8
+
+[IO] --- P-ARRAY (8-byte stride) ---
+[IO] P[0] = 0xdb298a75 meta=0x0000001d
+[IO] P[1] = 0x3c83ff0c meta=0x00000002
+[IO] P[2] = 0x0dec4548 meta=0x00000002
+[IO] P[3] = 0xf8c273e0 meta=0x0000000b
+[IO] P[4] = 0x38a99512 meta=0x00000000
+[IO] P[5] = 0xfc7fcfc8 meta=0x00000001
+[IO] P[6] = 0x4e110080 meta=0x00000014
+[IO] P[7] = 0xf8c13f63 meta=0x00000010
+[IO] P[8] = 0x8523e092 meta=0x00000012
+[IO] P[9] = 0x8f496087 meta=0x00000012
+[IO] P[10] = 0x9fbc973b meta=0x00000014
+[IO] P[11] = 0x22969a7b meta=0x00000009
+[IO] P[12] = 0xb892fffa meta=0x00000001
+[IO] P[13] = 0xf6d19ec7 meta=0x00000018
+[IO] P[14] = 0xf6c53add meta=0x00000002
+[IO] P[15] = 0x5a66f96e meta=0x00000004
+[IO] P[16] = 0x00000000 meta=0x00000000
+[IO] P[17] = 0x00000000 meta=0x00000000
+
+[IO] --- SEARCHING FOR S-BOX (0xd1310ba6) ---
+
+[IO] --- SCANNING CIPHER OBJECT FOR S-BOX PATTERN ---
+[IO] Non-zero regions (>=256 bytes) in cipher object:
+[IO]   offset +204, length 512 bytes
+[IO]   sample: f6 d0 ec 86 ba cc 88 fa 4e 68 84 8e f2 24 e0 22
+[IO]   offset +724, length 836 bytes
+[IO]   sample: 9d 90 83 8a d1 8c e7 f6 25 28 eb 82 99 64 8f 2e
+[IO]   offset +1692, length 268 bytes
+[IO]   sample: 77 1f 7b 66 f8 87 00 0c 46 01 40 00 1f 40 c0 02
+[IO] OUTPUT (15): 67 83 f0 f8 4a 21 ee 86 9f 45 8b 54 01 00 00
+[IO] IV_AFTER: a7 aa 14 d2 90 d4 c8 f4
+[IO] num_after: 7
+[IO] ===== END CAPTURE #1 =====
+
+
+[IO] ===== CAPTURE #2 (DECRYPT) =====
+[IO] length: 340
+[IO] encrypt: 0
+[IO] num: 7
+[IO] BF_KEY ptr: 0x2059e5a0
+[IO] IV_BEFORE: a7 aa 14 d2 90 d4 c8 f4
+[IO] INPUT (340/340): ea 71 4e 30 d2 20 d8 e1 90 34 29 82 f8 4f ac 86 89 88 76 61 38 95 42 03 6d 26 63 3a b8 ba 37 2e d6 dc 96 c6 64 a8 5c 2e 1c b0 97 d2 64 38 ff 85 4f 22 d1 8d 0c c6 7c e6 4e 60 46 0c c8 21 51 3b 5f c3 28 17 28 dc 37 a0 92 34 d9 bb 46 d1 84 c2 03 1c 01 43 ce 07 36 f7 79 39 c8 71 18 15 e9 db cd a0 c8 2e 0d aa 4b 90 cf b1 76 e7 65 65 3c a6 14 16 2e 8d 62 da c4 3b 7f cf 39 30 bf 5b 61 b5 06 52 d3 7f e2 11 9f bc 1b 9f ce 16 83 bb 1d 8d c7 21 ea 01 e0 93 16 81 e0 d4 cf 75 52 02 77 4e a7 ec a7 1b f2 09 69 44 69 dd a3 e1 6c b6 26 ba d0 4a 92 d2 75 a2 2e e8 d0 97 93 f5 bf 0d 97 4b e0 b0 57 c8 04 02 54 95 9b cd 40 3d 4c 40 57 1d c0 8e 45 f9 e2 4a 3c 99 fd 13 3e ac 86 b6 df 8c b4 15 0b d7 69 d4 41 99 9b 12 51 0b dc dd b9 cc 6e 65 1a f3 66 af 45 36 af a8 75 6b 05 c9 62 23 16 b4 28 55 dd e7 ca 31 f8 89 25 48 c0 b2 bf d9 b6 c0 aa 1b 49 b5 f2 36 02 83 e0 cc 56 1a 28 49 a9 e9 eb f5 3a ae d5 97 f3 e6 85 28 43 35 5b 42 be 6c a3 1f f3 de e1 14 ce 6c 95 8a c1 9b a6 bf 74 46 20 7a 3e 7c 3c cf 93 24 2d b0 77 61 61 8d 00 00 00 00
+[IO] OUTPUT (340): 1e 00 00 00 b0 23 f2 b9 ac 61 0f 77 4e d1 6b fb 58 8c fa b9 35 39 82 37 2d 7d e3 43 ef d7 95 84 4f a0 08 00 00 00 7d 20 d7 6c 10 f9 61 37 08 00 00 00 a9 d3 de 71 65 8e 68 bd 80 00 00 00 41 33 32 30 41 38 35 45 44 44 37 39 31 37 31 43 33 34 31 34 35 39 45 39 34 38 30 37 44 37 31 44 33 39 42 42 33 42 33 46 33 42 35 31 36 31 43 41 38 34 38 39 34 46 33 41 43 33 46 43 37 46 45 43 33 31 37 41 32 44 44 45 43 38 33 42 36 36 44 33 30 43 32 39 32 36 31 43 36 34 39 32 36 34 33 30 36 31 41 45 43 46 43 46 34 41 30 35 31 38 31 36 44 37 43 33 35 39 41 36 41 37 42 37 44 38 46 42 02 00 00 00 30 35 80 00 00 00 32 42 41 33 43 35 34 38 36 35 37 37 30 44 39 31 41 32 34 35 30 43 39 38 45 38 45 39 43 37 33 42 33 36 32 32 33 33 32 41 44 34 31 35 41 44 42 33 31 39 43 31 33 46 30 34 36 43 45 34 37 33 33 32 32 33 38 37 36 46 37 34 32 46 39 36 46 43 32 43 30 42 44 43 33 34 39 34 31 41 41 34 36 36 34 36 32 39 43 33 38 41 46 31 41 34 42 42 43 46 43 32 35 37 38 43 41 32 32 32 31 30 45 34 34 42 31 32 54 51 53 65 72 76 65 72 b0 9c e8 61
+[IO] IV_AFTER: 00 00 00 19 e1 d7 b1 c0
+[IO] num_after: 3
+[IO] ===== END CAPTURE #2 =====
+
+
+[IO] ===== CAPTURE #3 (ENCRYPT) =====
+[IO] length: 190
+[IO] encrypt: 1
+[IO] num: 0
+[IO] BF_KEY ptr: 0x2059e978
+[IO] IV_BEFORE: 00 00 00 00 00 00 00 00
+[IO] INPUT (190/190): f0 ec fe 95 73 16 a6 b7 00 00 00 23 00 00 00 55 19 40 47 d3 9c 73 87 17 2d 50 b7 52 ba 70 63 f5 8a 8e d1 f4 49 be 11 84 76 bc 9e 6b 65 f6 2b 9c 9a 4f 80 00 00 00 38 30 41 38 31 38 41 46 42 44 41 31 36 30 37 36 30 38 37 39 46 33 33 32 38 41 43 43 45 37 44 46 32 36 45 39 30 39 44 41 42 38 31 46 37 32 34 34 31 41 37 38 34 35 35 43 32 35 45 37 46 45 35 43 33 36 44 30 34 43 36 39 36 34 37 30 38 32 35 31 39 34 35 35 36 34 30 31 41 37 37 42 44 39 36 42 45 33 43 35 41 31 46 39 30 32 31 32 42 30 39 36 36 31 43 37 43 46 31 35 42 35 43 38 42 42 45 43 54 51 43 6c 69 65 6e 74
+[IO] OUTPUT (190): 4c 66 7e 70 cc a6 b2 aa 96 cb b7 f0 e9 06 79 25 8f 44 1d 92 c2 fa 66 ce 70 b5 16 dc e0 33 be 29 c1 65 05 5b 8f cd 04 31 95 4d 2c 5b c1 9f d8 70 bc b1 3d 9f bf 95 9d d6 91 9f d5 b8 02 eb 44 c3 a3 50 b3 04 99 2b 88 85 5c b4 96 18 f8 03 3f 68 b4 4c 79 8a 22 c5 0f 1d 31 32 da 30 99 ce e3 a6 e4 1d 13 7c f6 b0 82 4a c2 57 d8 89 4f 3b 0d 7c fe 01 63 14 5b 89 16 2c 68 89 83 bb 0f 23 f2 ae 2c 38 f6 c0 a7 58 9a a2 73 0e 2d 05 d1 1e 67 ca ec d4 00 27 27 7d 87 12 a9 21 33 c5 04 d5 d7 e0 ec b9 be 06 34 e0 54 02 40 5c 13 e1 05 54 40 0d ba 91 7d 8d 80 63 10 9d 81 e1 f1 7f c3 70
+[IO] IV_AFTER: 81 e1 f1 7f c3 70 26 70
+[IO] num_after: 6
+[IO] ===== END CAPTURE #3 =====
+
+[HS] Returned: 3

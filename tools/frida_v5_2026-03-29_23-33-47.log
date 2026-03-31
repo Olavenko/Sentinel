@@ -1,0 +1,250 @@
+[*] Frida v5 — BF Key Schedule Catcher — 2026-03-29T21:33:47.780Z
+[*] Hooked BF_cfb64_encrypt
+[*] Hooked wrappers
+[*] Hooked DoReceiveShakeHand with Stalker
+[*] All hooks ready! Login now.
+
+
+[HS] ===== HANDSHAKE #1 =====
+[HS] --- CALL STACK ---
+[HS] #0: 0xfee80d 0xfee80d
+[HS] #1: 0xfeeb6c 0xfeeb6c
+[HS] #2: 0xe42ecb 0xe42ecb
+[HS] #3: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[HS] #4: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[HS] #5: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[HS] #6: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[HS] Returned: 0
+[HS] ===== END =====
+
+
+[HS] ===== HANDSHAKE #2 =====
+[HS] --- CALL STACK ---
+[HS] #0: 0xfee80d 0xfee80d
+[HS] #1: 0xfeeb6c 0xfeeb6c
+[HS] #2: 0xe42ecb 0xe42ecb
+[HS] #3: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[HS] #4: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[HS] #5: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[HS] #6: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[HS] Enabling Stalker on this thread for call #3...
+
+[BF] ===== NEW BF_KEY: 0x178ce5a0 =====
+[BF] --- CALL STACK ---
+[BF] #0: 0x1e423ab 0x1e423ab
+[BF] #1: 0x12410f0 0x12410f0
+[BF] #2: 0xfeec33 0xfeec33
+[BF] #3: 0x4623f5 0x4623f5
+[BF] #4: 0xe42ecb 0xe42ecb
+[BF] #5: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[BF] #6: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[BF] #7: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[BF] #8: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[BF] P[0] = 0xdb298a75
+[BF] *** THIS IS THE HANDSHAKE KEY CONTEXT ***
+[BF] --- CALLER REGISTER STATE ---
+[BF] EIP: 0x12410f0
+[BF] ESP: 0x178ce4c0
+[BF] EBP: undefined
+[BF] EAX: 0x178cea24
+[BF] EBX: 0x0
+[BF] ECX: 0x219847c
+[BF] EDX: 0x178ce5a0
+[BF] ESI: 0x219847c
+[BF] EDI: 0x2196868
+[BF] --- STACK DUMP (256 bytes) ---
+           0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
+178ce4c0  ab 23 e4 01 68 f6 8c 17 24 ea 8c 17 0f 00 00 00  .#..h...$.......
+178ce4d0  a0 e5 8c 17 24 ee 8c 17 58 e5 8c 17 00 00 00 00  ....$...X.......
+178ce4e0  1c c0 d3 7f 68 68 19 02 7c 84 19 02 00 00 00 00  ....hh..|.......
+178ce4f0  08 00 00 00 00 00 00 00 00 00 00 00 ec e6 8c 17  ................
+178ce500  04 00 00 00 20 00 00 00 04 00 00 00 00 00 00 00  .... ...........
+178ce510  00 00 76 17 08 37 77 15 08 1e 77 15 59 6e 13 01  ..v..7w...w.Yn..
+178ce520  00 00 00 00 50 26 77 15 08 1e 77 15 5f 6e 13 01  ....P&w...w._n..
+178ce530  00 00 00 00 d0 1c 77 15 d0 1c 77 15 00 00 00 00  ......w...w.....
+178ce540  00 00 00 00 04 00 ff ff ff ff ff ff ff ff ff ff  ................
+178ce550  ff ff ff ff ff ff ff ff 00 00 00 00 ff ff ff ff  ................
+178ce560  0f 00 00 00 08 37 77 15 08 1e 77 15 93 f8 c1 74  .....7w...w....t
+178ce570  00 00 00 00 d0 1c 77 15 04 1c 77 15 00 00 00 00  ......w...w.....
+178ce580  00 00 00 00 04 00 ff ff ff ff ff ff ff ff ff ff  ................
+178ce590  01 00 00 00 00 00 00 00 00 00 00 00 7c 84 19 02  ............|...
+178ce5a0  75 8a 29 db 1d 00 00 00 0c ff 83 3c 02 00 00 00  u.)........<....
+178ce5b0  48 45 ec 0d 02 00 00 00 e0 73 c2 f8 0b 00 00 00  HE.......s......
+[BF] --- STACK FRAME SCAN FOR ASCII STRINGS ---
+[BF] ===== END =====
+
+
+[BF] ===== NEW BF_KEY: 0x178ce978 =====
+[BF] --- CALL STACK ---
+[BF] #0: 0x1e5088a 0x1e5088a
+[BF] #1: 0x12410f0 0x12410f0
+[BF] #2: 0xfeec65 0xfeec65
+[BF] #3: 0x4623f5 0x4623f5
+[BF] #4: 0xe42ecb 0xe42ecb
+[BF] #5: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[BF] #6: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[BF] #7: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[BF] #8: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[BF] P[0] = 0xdb298a75
+[BF] *** THIS IS THE HANDSHAKE KEY CONTEXT ***
+[BF] --- CALLER REGISTER STATE ---
+[BF] EIP: 0x12410f0
+[BF] ESP: 0x178ce938
+[BF] EBP: undefined
+[BF] EAX: 0x178ce9fc
+[BF] EBX: 0x0
+[BF] ECX: 0x219847c
+[BF] EDX: 0x178ce978
+[BF] ESI: 0x219847c
+[BF] EDI: 0x2196868
+[BF] --- STACK DUMP (256 bytes) ---
+           0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
+178ce938  8a 08 e5 01 fc e9 8c 17 68 ee 8c 17 ad 00 00 00  ........h.......
+178ce948  78 e9 8c 17 30 ee 8c 17 64 e9 8c 17 01 00 00 00  x...0...d.......
+178ce958  68 68 19 02 7c 84 19 02 00 00 00 00 00 00 00 00  hh..|...........
+178ce968  58 fb d8 30 80 27 d1 30 7c 84 19 02 a6 00 00 00  X..0.'.0|.......
+178ce978  75 8a 29 db 1d 00 00 00 0c ff 83 3c 02 00 00 00  u.)........<....
+178ce988  48 45 ec 0d 02 00 00 00 e0 73 c2 f8 0b 00 00 00  HE.......s......
+178ce998  12 95 a9 38 00 00 00 00 c8 cf 7f fc 01 00 00 00  ...8............
+178ce9a8  80 00 11 4e 14 00 00 00 63 3f c1 f8 10 00 00 00  ...N....c?......
+178ce9b8  92 e0 23 85 12 00 00 00 87 60 49 8f 12 00 00 00  ..#......`I.....
+178ce9c8  3b 97 bc 9f 14 00 00 00 7b 9a 96 22 09 00 00 00  ;.......{.."....
+178ce9d8  fa ff 92 b8 01 00 00 00 c7 9e d1 f6 18 00 00 00  ................
+178ce9e8  dd 3a c5 f6 02 00 00 00 6e f9 66 5a 04 00 00 00  .:......n.fZ....
+178ce9f8  00 00 00 00 8f ff 43 0e 57 f8 df a6 00 00 00 12  ......C.W.......
+178cea08  00 00 00 3a 81 fd d4 b3 0b 4d 6c 84 24 09 9e 6e  ...:.....Ml.$..n
+178cea18  a3 39 84 00 4c 80 00 00 00 37 31 46 32 35 32 43  .9..L....71F252C
+178cea28  32 31 34 36 45 45 46 37 44 37 41 43 37 34 39 31  2146EEF7D7AC7491
+[BF] --- STACK FRAME SCAN FOR ASCII STRINGS ---
+[BF] ===== END =====
+
+[HS] Returned: 3
+[STALKER] Call summary during handshake:
+[STALKER] 0x1231020 x936 0x1231020
+[STALKER] 0x123324f x644 0x123324f
+[STALKER] 0x124ac80 x576 0x124ac80
+[STALKER] 0x77a224b0 x468 0x77a224b0 Conquer.exe!RtlGetCurrentServiceSessionId
+[STALKER] 0x1241bb0 x409 0x1241bb0
+[STALKER] 0x77a422a0 x389 0x77a422a0 Conquer.exe!RtlSizeHeap
+[STALKER] 0x1233249 x327 0x1233249
+[STALKER] 0x1242f30 x277 0x1242f30
+[STALKER] 0x1259f60 x271 0x1259f60
+[STALKER] 0x1270830 x271 0x1270830
+[STALKER] 0x123ec90 x245 0x123ec90
+[STALKER] 0x1b693a1 x238 0x1b693a1
+[STALKER] 0x77a1f2a0 x224 0x77a1f2a0 Conquer.exe!RtlAnsiStringToUnicodeString
+[STALKER] 0x77a6de8d x224 0x77a6de8d Conquer.exe!RtlRcuSynchronize
+[STALKER] 0x77a5b460 x210 0x77a5b460 Conquer.exe!RtlRetrieveNtUserPfn
+[STALKER] 0x77a22aa0 x210 0x77a22aa0 Conquer.exe!RtlGetCurrentServiceSessionId
+[STALKER] 0x77a70b1a x210 0x77a70b1a Conquer.exe!RtlGetSystemTimeAndBias
+[STALKER] 0x77a23210 x210 0x77a23210 Conquer.exe!RtlGetCurrentServiceSessionId
+[STALKER] 0x77a1f8a0 x210 0x77a1f8a0 Conquer.exe!RtlAllocateHeap
+[STALKER] 0x77a224d0 x210 0x77a224d0 Conquer.exe!RtlGetCurrentServiceSessionId
+[STALKER] 0x77a23290 x210 0x77a23290 Conquer.exe!RtlGetCurrentServiceSessionId
+[STALKER] 0x77a71bcd x179 0x77a71bcd Conquer.exe!RtlGetSystemTimeAndBias
+[STALKER] 0x77a1ee30 x179 0x77a1ee30 Conquer.exe!RtlFreeHeap
+[STALKER] 0x124bfc0 x177 0x124bfc0
+[STALKER] 0x76c40100 x165 0x76c40100 Conquer.exe!malloc
+[STALKER] 0x123dbd0 x160 0x123dbd0
+[STALKER] 0x123eab0 x150 0x123eab0
+[STALKER] 0x77a7463b x149 0x77a7463b Conquer.exe!RtlNumberOfSetBitsUlongPtr
+[STALKER] 0x77a7460d x149 0x77a7460d Conquer.exe!RtlNumberOfSetBitsUlongPtr
+[STALKER] 0x77a745bd x149 0x77a745bd Conquer.exe!RtlNumberOfSetBitsUlongPtr
+[STALKER] 0x77a745ed x149 0x77a745ed Conquer.exe!RtlNumberOfSetBitsUlongPtr
+[STALKER] 0x77aba030 x148 0x77aba030 Conquer.exe!RtlCustomCPToUnicodeN
+[STALKER] 0x77a665cc x144 0x77a665cc Conquer.exe!wcstombs
+[STALKER] 0x77a64322 x144 0x77a64322 Conquer.exe!wcstombs
+[STALKER] 0x76c40080 x140 0x76c40080 Conquer.exe!free
+[STALKER] 0x76c400b0 x140 0x76c400b0 Conquer.exe!free_base
+[STALKER] 0x77a47960 x132 0x77a47960 Conquer.exe!RtlMultiByteToUnicodeN
+[STALKER] 0x76c7c8a0 x132 0x76c7c8a0 Conquer.exe!isxdigit
+[STALKER] 0x1244600 x130 0x1244600
+[STALKER] 0x1246d90 x127 0x1246d90
+[STALKER] 0x124ab70 x127 0x124ab70
+[STALKER] 0x77a66617 x126 0x77a66617 Conquer.exe!wcstombs
+[STALKER] 0x77a478b0 x126 0x77a478b0 Conquer.exe!RtlAnsiCharToUnicodeChar
+[STALKER] 0x1270910 x125 0x1270910
+[STALKER] 0x77a5fea0 x114 0x77a5fea0 Conquer.exe!memset
+[STALKER] 0x123e470 x100 0x123e470
+[STALKER] 0x123e830 x98 0x123e830
+[STALKER] 0x77a6de34 x96 0x77a6de34 Conquer.exe!RtlRcuSynchronize
+[STALKER] 0x12470a0 x94 0x12470a0
+[STALKER] 0x124af20 x87 0x124af20
+[HS] Stalker stopped
+[HS] ===== END =====
+
+
+[WRAP-ENC] ===== FIRST ENCRYPT WRAPPER CALL =====
+[WRAP-ENC] arg0 (this/ctx): 0x2197870
+[WRAP-ENC] --- CALL STACK ---
+[WRAP-ENC] #0: 0xfeedb9 0xfeedb9
+[WRAP-ENC] #1: 0x1172de1 0x1172de1
+[WRAP-ENC] #2: 0xe43069 0xe43069
+[WRAP-ENC] #3: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[WRAP-ENC] #4: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[WRAP-ENC] #5: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[WRAP-ENC] #6: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[WRAP-ENC] Context (512 bytes):
+           0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
+02197870  34 00 7d 09 28 5e 57 e4 da 7a f3 c0 e8 3a 96 69  4.}.(^W..z...:.i
+02197880  1a 82 fd 21 d7 6b 3e 6a c3 b5 20 95 2b 72 7b 89  ...!.k>j.. .+r{.
+02197890  9d 76 e3 03 b8 8c 8c 9e 1f 7e dd ed e9 d2 a6 3e  .v.......~.....>
+021978a0  5c 4d df 71 00 00 00 00 00 00 00 00 00 00 00 00  \M.q............
+021978b0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021978c0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021978d0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021978e0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021978f0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197900  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197910  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197920  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197930  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197940  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197950  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197960  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197970  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197980  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197990  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021979a0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021979b0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021979c0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021979d0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021979e0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+021979f0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a00  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a10  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a20  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a30  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a40  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a50  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+02197a60  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+[WRAP-ENC] ===== END =====
+
+
+[BF] ===== NEW BF_KEY: 0x21984bc =====
+[BF] --- CALL STACK ---
+[BF] #0: 0x1172e1f 0x1172e1f
+[BF] #1: 0x12410f0 0x12410f0
+[BF] #2: 0xfeedb9 0xfeedb9
+[BF] #3: 0xe43069 0xe43069
+[BF] #4: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[BF] #5: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[BF] #6: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[BF] #7: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[BF] P[0] = 0xbd4d5492
+[BF] ===== END =====
+
+
+[WRAP-DEC] ===== FIRST DECRYPT WRAPPER CALL =====
+[WRAP-DEC] arg0 (this/ctx): 0x178cfe9c
+[WRAP-DEC] --- CALL STACK ---
+[WRAP-DEC] #0: 0xfee937 0xfee937
+[WRAP-DEC] #1: 0x1170dce 0x1170dce
+[WRAP-DEC] #2: 0xe42ecb 0xe42ecb
+[WRAP-DEC] #3: 0x76c8e9eb 0x76c8e9eb Conquer.exe!isgraph
+[WRAP-DEC] #4: 0x76205d49 0x76205d49 Conquer.exe!BaseThreadInitThunk
+[WRAP-DEC] #5: 0x77a4d81b 0x77a4d81b Conquer.exe!RtlInitializeExceptionChain
+[WRAP-DEC] #6: 0x77a4d7a1 0x77a4d7a1 Conquer.exe!RtlGetAppContainerNamedObjectPath
+[WRAP-DEC] Context (512 bytes):
+[WRAP-DEC] ===== END =====
+
