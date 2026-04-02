@@ -1,0 +1,50 @@
+[*] Frida v17 — Stage 5: Cipher Validation
+[*] Started: 2026-03-31T21:07:51.852Z
+[*] Log file: F:\Sentinel\tools\frida_v17_stage5_2026-03-31_23-07-51.log
+---
+[*] Hook installed! Login and play ~30 seconds.
+[*] Each cipher call will be validated against our implementation.
+[*] Type printSummary() before detaching.
+
+[VALIDATE #0] MATCH ctx=0x22f37e8 len=2 commit=1 counters(game)=(0,0) counters(ours)=(0,0)
+  encrypted: c548
+  game_dec:  0800
+  our_dec:   0800
+[VALIDATE #1] MATCH ctx=0x22f37e8 len=6 commit=1 counters(game)=(2,0) counters(ours)=(2,0)
+  encrypted: 6912a129239d
+  game_dec:  23048ad7c13b
+  our_dec:   23048ad7c13b
+[VALIDATE #2] MATCH ctx=0x22f35e0 len=472 commit=1 counters(game)=(0,0) counters(ours)=(0,0)
+  encrypted: d8019607af91acf34d2502218994fc480be3c8770b21eb8093d770c464c9c1df16b773c7c07037ce445cc8535dd91b531d0a8c205ccea7ef113c52076653bcf4
+  game_dec:  d994dc556a5c39dd0b5d13b78c82baebefb73c55235448ebef7d39ee5158649137f988579e44860c9dc0b99ec35cce588827722258a0821fc1cd15d077f7b92d
+  our_dec:   d994dc556a5c39dd0b5d13b78c82baebefb73c55235448ebef7d39ee5158649137f988579e44860c9dc0b99ec35cce588827722258a0821fc1cd15d077f7b92d
+[VALIDATE #3] MATCH ctx=0x22f37e8 len=2 commit=1 counters(game)=(8,0) counters(ours)=(8,0)
+  encrypted: 3df0
+  game_dec:  0c00
+  our_dec:   0c00
+[VALIDATE #4] MATCH ctx=0x22f37e8 len=10 commit=1 counters(game)=(10,0) counters(ours)=(10,0)
+  encrypted: 743a21bc57f677980b22
+  game_dec:  74060600000028000000
+  our_dec:   74060600000028000000
+[VALIDATE #5] MATCH ctx=0x22f37e8 len=2 commit=1 counters(game)=(20,0) counters(ours)=(20,0)
+  encrypted: 7d74
+  game_dec:  4401
+  our_dec:   4401
+[VALIDATE #6] MATCH ctx=0x22f37e8 len=322 commit=1 counters(game)=(22,0) counters(ours)=(22,0)
+  encrypted: 395ef4c4f743bad578c27485f68b4082a8a24dd85093d5eaa0f12b3690506344d6be2720bd8b7a15a3c77a28868cec975372d609777b7e5c8a2890db677e929d
+  game_dec:  6506994c4196bc99ff4011dad093966b7fca0d8830924b6f7572ebe4b325ab08950aa20ceb18b693481ef70ad9e15230cac1b693481ef70ad9e15230cac1b693
+  our_dec:   6506994c4196bc99ff4011dad093966b7fca0d8830924b6f7572ebe4b325ab08950aa20ceb18b693481ef70ad9e15230cac1b693481ef70ad9e15230cac1b693
+[VALIDATE #7] MISMATCH ctx=0x22f35e0 len=12 commit=1 counters(game)=(0,0) counters(ours)=(216,1)
+  encrypted: 1ae44b2a5882ea000a85fb7c
+  game_dec:  f5ca0187156d5de27f578c62
+  our_dec:   a99054de4c3a00ba2804de32
+  FIRST MISMATCH at byte 0: game=0xf5 ours=0xa9
+
+=== STAGE 5 VALIDATION SUMMARY ===
+Calls validated: 8
+MATCH: 7
+MISMATCH: 1
+Result: FAILURES DETECTED — check log
+  Context 0x22f37e8 final counters=(88,1)
+  Context 0x22f35e0 final counters=(228,1)
+=== END SUMMARY ===

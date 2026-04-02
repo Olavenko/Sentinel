@@ -1,0 +1,37 @@
+[*] Frida v14 — Stage 1: BF_cfb64_encrypt observation
+[*] Started: 2026-03-31T19:45:34.038Z
+[*] Log file: F:\Sentinel\tools\frida_v14_stage1_2026-03-31_21-45-34.log
+[*] Target: BF_cfb64_encrypt @ 0x12410f0
+[*] Detailed logging for first 20 calls
+---
+[*] Hook installed! Login now and play for ~30 seconds.
+[*] Before detaching, type: rpc.exports.summary() or just call printSummary()
+[*] Or paste printSummary() in console, then Ctrl+D.
+
+[*] Hook installed! Login now and play for ~30 seconds, then detach (Ctrl+D).
+[*] Summary will print on detach.
+
+[CALL #0] +=275ms enc=0 len=15 num=0 ivec=0000000000000000 ctx=0x2d1de5a0 caller=0x1e423ab in[0:15]=de668e79629eeab68811935e125bc1 backtrace:
+    [0] 0x1e423ab Conquer.exe+1a423ab
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec33 Conquer.exe+beec33
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #0] LEAVE enc=0 out[0:15]=62ec0e9cdd2efeab9f280840010000
+[CALL #1] +=276ms enc=0 len=320 num=7 ivec=8811935e125bc170 ctx=0x2d1de5a0 caller=0x1e3f18f in[0:16]=7a89756554189dc5d196f10f51821ffd backtrace:
+    [0] 0x1e3f18f Conquer.exe+1a3f18f
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec33 Conquer.exe+beec33
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #1] LEAVE enc=0 out[0:16]=0a0000000a67f3b55ea561bb44470800
+[CALL #2] +=279ms enc=1 len=169 num=0 ivec=0000000000000000 ctx=0x2d1de978 caller=0x1e5088a in[0:16]=7501a6421cd8d2a20000000e0000008e backtrace:
+    [0] 0x1e5088a Conquer.exe+1a5088a
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec65 Conquer.exe+beec65
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #2] LEAVE enc=1 out[0:16]=c98b26a7a368c6bf8a28d23ae6a7aea5

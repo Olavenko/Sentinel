@@ -19,6 +19,14 @@ public sealed class ProxyEndpointConfig
 
     /// <summary>Whether to perform DH MITM on this endpoint to decrypt traffic.</summary>
     public bool EnableMitm { get; set; }
+
+    /// <summary>
+    /// Whether to apply the CO 7xxx gameplay cipher to server→client packets for
+    /// read-only decryption logging. The original encrypted bytes are always forwarded
+    /// unchanged — only the logged copy is decrypted. Mutually exclusive with
+    /// <see cref="EnableMitm"/>; if both are set, MITM takes precedence.
+    /// </summary>
+    public bool EnableGameplayDecrypt { get; set; }
 }
 
 /// <summary>

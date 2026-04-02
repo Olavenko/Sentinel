@@ -10,13 +10,13 @@
 ### Stage 1: Runtime Observation (BF_cfb64_encrypt only)
 | # | Step | Status | Report |
 |---|------|--------|--------|
-| 1.1 | Write Frida script: hook `BF_cfb64_encrypt`, log caller, return addr, ctx ptr, ivec ptr + dump, num, len, enc, **backtrace** | ⬜ | — |
-| 1.2 | Run script on **Session A** — capture full login + early gameplay | ⬜ | — |
-| 1.3 | Run script on **Session B** — same steps | ⬜ | — |
-| 1.4 | Run script on **Session C** — same steps | ⬜ | — |
-| 1.5 | Compare 3 sessions: identify what is **stable** vs **session-specific** (ctx ptr, ivec, num, caller, backtrace) | ⬜ | — |
-| 1.6 | Identify the **primary caller(s)** that invoke `BF_cfb64_encrypt` | ⬜ | — |
-| 1.7 | Write Stage 1 Report | ⬜ | `phase2_stage1_report.md` |
+| 1.1 | Write Frida script: hook `BF_cfb64_encrypt`, log caller, return addr, ctx ptr, ivec ptr + dump, num, len, enc, **backtrace** | ✅ | — |
+| 1.2 | Run script on **Session A** — capture full login + early gameplay | ✅ | — |
+| 1.3 | Run script on **Session B** — same steps | ✅ | — |
+| 1.4 | Run script on **Session C** — same steps | ✅ | — |
+| 1.5 | Compare 3 sessions: identify what is **stable** vs **session-specific** (ctx ptr, ivec, num, caller, backtrace) | ✅ | — |
+| 1.6 | Identify the **primary caller(s)** that invoke `BF_cfb64_encrypt` | ✅ | — |
+| 1.7 | Write Stage 1 Report | ✅ | `phase2_stage1_report.md` |
 
 **Stage 1 Decision Gate:**
 - ✅ If stable caller(s) found → proceed to Stage 2
@@ -27,11 +27,11 @@
 ### Stage 2: Trace Back to Init Path
 | # | Step | Status | Report |
 |---|------|--------|--------|
-| 2.1 | Analyze primary caller address(es) in **Ghidra** via GhidraMCP + Claude Code | ⬜ | — |
-| 2.2 | Identify the function that **creates or allocates** the cipher context | ⬜ | — |
-| 2.3 | Identify the function that **fills** the context (key schedule / P-array / S-boxes) | ⬜ | — |
-| 2.4 | Determine: is there a **separate** handshake ctx vs game ctx? | ⬜ | — |
-| 2.5 | Hook the init function — log the **input key material** before expansion | ⬜ | — |
+| 2.1 | Analyze primary caller address(es) in **Ghidra** via GhidraMCP + Claude Code | ✅ | — |
+| 2.2 | Identify the function that **creates or allocates** the cipher context | ✅ | — |
+| 2.3 | Identify the function that **fills** the context (key schedule / P-array / S-boxes) | ✅ | — |
+| 2.4 | Determine: is there a **separate** handshake ctx vs game ctx? | ✅ | — |
+| 2.5 | Hook the init function — log the **input key material** before expansion | ✅ | — |
 | 2.6 | Write Stage 2 Report | ⬜ | `phase2_stage2_report.md` |
 
 **Stage 2 Decision Gate:**
@@ -54,10 +54,10 @@
 ### Stage 4: Key Source Hypothesis Testing
 | # | Step | Status | Report |
 |---|------|--------|--------|
-| 4.1 | Test Hypothesis A: key is **static** (compare ctx P-array across 3 sessions) | ⬜ | — |
-| 4.2 | Test Hypothesis B: key is **DH-derived** (check if DH output feeds into key schedule) | ⬜ | — |
-| 4.3 | Test Hypothesis C: DH is handshake-only, game cipher has **independent key** | ⬜ | — |
-| 4.4 | Conclusive determination of key source | ⬜ | — |
+| 4.1 | Test Hypothesis A: key is **static** (compare ctx P-array across 3 sessions) | ✅ | — |
+| 4.2 | Test Hypothesis B: key is **DH-derived** (check if DH output feeds into key schedule) | ✅ | — |
+| 4.3 | Test Hypothesis C: DH is handshake-only, game cipher has **independent key** | ✅ | — |
+| 4.4 | Conclusive determination of key source | ✅ | — |
 | 4.5 | Write Stage 4 Report | ⬜ | `phase2_stage4_report.md` |
 
 ---
@@ -65,10 +65,10 @@
 ### Stage 5: Key Extraction
 | # | Step | Status | Report |
 |---|------|--------|--------|
-| 5.1 | Extract **raw key** if init function is hookable | ⬜ | — |
-| 5.2 | If raw key not accessible: dump **expanded context** (P-array + S-boxes) | ⬜ | — |
-| 5.3 | Validate extracted key/context: encrypt known plaintext and compare with real capture | ⬜ | — |
-| 5.4 | Write Stage 5 Report | ⬜ | `phase2_stage5_report.md` |
+| 5.1 | Extract **raw key** if init function is hookable | ✅ | — |
+| 5.2 | If raw key not accessible: dump **expanded context** (P-array + S-boxes) | ✅ | — |
+| 5.3 | Validate extracted key/context: encrypt known plaintext and compare with real capture | ✅ | — |
+| 5.4 | Write Stage 5 Report | ✅ | `phase2_stage5_report.md` |
 
 ---
 

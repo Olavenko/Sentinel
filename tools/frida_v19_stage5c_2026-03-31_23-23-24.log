@@ -1,0 +1,49 @@
+[*] Frida v19 — Stage 5c: Final Validation (send counter-reset aware)
+[*] Started: 2026-03-31T21:23:24.372Z
+[*] Log file: F:\Sentinel\tools\frida_v19_stage5c_2026-03-31_23-23-24.log
+---
+[*] Hook installed! Login and play ~1 minute for more data.
+[*] Type printSummary() before detaching.
+
+[VALIDATE #0] MATCH ctx=0x23505e8 len=2 commit=1 game_counters=(0,0)
+  encrypted: c548
+  game_dec:  0800
+  our_dec:   0800
+[VALIDATE #1] MATCH ctx=0x23505e8 len=6 commit=1 game_counters=(2,0)
+  encrypted: 69128b63ca6a
+  game_dec:  230428735f44
+  our_dec:   230428735f44
+[VALIDATE #2] MATCH ctx=0x23503e0 len=472 commit=1 game_counters=(0,0)
+  encrypted: d801960717dc58b0d8182febdd37d7a5d1d725b2cbf1b4dfc933cffa6ce3773ffa65323e4812a64f0e96de8dcec5ddaf439d5b812bde53ed8e22058675e468a1
+  game_dec:  d994dc55e18876e9528ec11bc9b8083542f4e2092f59bd1e4a33c20dd1fa0f9ff9d49cc816629f14396cd873fa9da2976d5e0f382fa1cd3f382c60c8468cf478
+  our_dec:   d994dc55e18876e9528ec11bc9b8083542f4e2092f59bd1e4a33c20dd1fa0f9ff9d49cc816629f14396cd873fa9da2976d5e0f382fa1cd3f382c60c8468cf478
+[VALIDATE #3] MATCH ctx=0x23505e8 len=2 commit=1 game_counters=(8,0)
+  encrypted: 3df0
+  game_dec:  0c00
+  our_dec:   0c00
+[VALIDATE #4] MATCH ctx=0x23505e8 len=10 commit=1 game_counters=(10,0)
+  encrypted: 743a21bc57f677980b22
+  game_dec:  74060600000028000000
+  our_dec:   74060600000028000000
+[VALIDATE #5] MATCH ctx=0x23505e8 len=2 commit=1 game_counters=(20,0)
+  encrypted: 7d74
+  game_dec:  4401
+  our_dec:   4401
+[VALIDATE #6] MATCH ctx=0x23505e8 len=322 commit=1 game_counters=(22,0)
+  encrypted: 395e14921454db281357703f184295ac902aa69147cacd6d05ab96e7a8baf1b0a003572f91b53afd563badd6deb6cb56be0c96e18287a9a2d212b71a8a00d275
+  game_dec:  650697297fe7aa46491951713e0fcb89fc42b31c4107ca172fd730f9308b8247f2d1a5fc29fbb21d17d18ae55c42202c1426b21d17d18ae55c42202c1426b21d
+  our_dec:   650697297fe7aa46491951713e0fcb89fc42b31c4107ca172fd730f9308b8247f2d1a5fc29fbb21d17d18ae55c42202c1426b21d17d18ae55c42202c1426b21d
+[VALIDATE #7] MATCH ctx=0x23503e0 len=12 commit=1 game_counters=(0,0)
+  encrypted: 7a7db3595882ea00acda9709
+  game_dec:  f3538eb0156d5de215a24a35
+  our_dec:   f3538eb0156d5de215a24a35
+
+=== STAGE 5c FINAL VALIDATION SUMMARY ===
+Calls validated: 8
+MATCH: 8
+MISMATCH: 0
+
+*** CIPHER IMPLEMENTATION FULLY VERIFIED ***
+*** Algorithm + Tables + Counter behavior = CORRECT ***
+*** Ready for MITM integration ***
+=== END SUMMARY ===

@@ -56,7 +56,11 @@
       "Bash(find . -name *.gdb -o -name *ghidra* -o -name *project*)",
       "Bash(xargs grep:*)",
       "mcp__ghidra__get_function_by_address",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(taskkill /PID 13768 /F)",
+      "Bash(cmd /c \"taskkill /PID 13768 /F\")",
+      "Bash(powershell:*)",
+      "Bash(dotnet run:*)"
     ]
   }
 }

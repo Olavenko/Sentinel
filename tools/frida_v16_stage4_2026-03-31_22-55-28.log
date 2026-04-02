@@ -1,0 +1,50 @@
+[*] Frida v16 — Stage 4b: Multi-Context Table Comparison
+[*] Started: 2026-03-31T20:55:28.867Z
+[*] Log file: F:\Sentinel\tools\frida_v16_stage4_2026-03-31_22-55-28.log
+---
+[*] Hook installed! Login, play ~30 seconds, then printSummary() + Ctrl+D.
+
+[*] Tables will be dumped on first custom_cipher call.
+[*] Type printSummary() before detaching.
+
+
+=== NEW CIPHER CONTEXT: 0x21faca0 ===
+[*] counterA: 0 counterB: 0
+[TABLE_A_FULL] 9d90838ad18ce7f62528eb8299648f2e2d40d3fae1bcb7e6b5d83bf2a9945f1ebdf0236af1ec87d645888b62b9c42f0e4da073da011c57c6d538dbd2c9f4fffedd50c34a114c27b665e82b42d924cfee6d0013ba217cf7a6f5987bb2e9549fdefdb0632a31acc7968548cb22f9846fce8d60b39a41dc978615f81b9209b43fbe1d10030a510c6776a5a86b0219e40faeadc0537a613c37663558bb722914df9e3d70a3ea716c0756c5080be23944af8ecd20f35a819cd74655b85b5249747f7e5dd043ca91cca736e568abc259a44f6eed80933aa1fc77267518fb3269d41f5e7d30e3aab12c471605c84ba27904ef4e0de0331ac15c170695789b128934bf3e
+[TABLE_B_FULL] 624fe815deeb04911ac7e04d16e37c49d23fd8854edbf4018ab7d0bd86d36cb9422fc8f5becbe471faa7c02df6c35c29b21fb8652ebbd4e16a97b09d66b34c99220fa8d59eabc451da87a00dd6a33c0992ff98450e9bb4c14a77907d46932c7902ef88b57e8ba431ba6780edb6831ce972df7825ee7b94a12a57705d26730c59e2cf68955e6b84119a4760cd9663fcc952bf5805ce5b74810a37503d0653ec39c2af48753e4b64f17a2740ad7643dca9329f38e5ae3b5461ea17301de633cc19a28f28551e2b44d15a07208d5623bc89127f18c58e1b3441caf710fdc613acf9826f0835fe0b24b13ae7006d36039c69f25ff8a56efb1421aad7f0dda6f38cd9
+=== END CONTEXT DUMP ===
+
+[CIPHER #0] ENTER ctx=0x21faca0 len=2 commit=1 cA=0 cB=0 buf[0:2]=c548
+[CIPHER #0] LEAVE ctx=0x21faca0 len=2 commit=1 buf_after[0:2]=0800
+[CIPHER #1] ENTER ctx=0x21faca0 len=6 commit=1 cA=2 cB=0 buf[0:6]=691218ec0323
+[CIPHER #1] LEAVE ctx=0x21faca0 len=6 commit=1 buf_after[0:6]=2304118bc3d0
+
+=== NEW CIPHER CONTEXT: 0x21faa98 ===
+[*] counterA: 0 counterB: 0
+[TABLE_A_FULL] 9d90838ad18ce7f62528eb8299648f2e2d40d3fae1bcb7e6b5d83bf2a9945f1ebdf0236af1ec87d645888b62b9c42f0e4da073da011c57c6d538dbd2c9f4fffedd50c34a114c27b665e82b42d924cfee6d0013ba217cf7a6f5987bb2e9549fdefdb0632a31acc7968548cb22f9846fce8d60b39a41dc978615f81b9209b43fbe1d10030a510c6776a5a86b0219e40faeadc0537a613c37663558bb722914df9e3d70a3ea716c0756c5080be23944af8ecd20f35a819cd74655b85b5249747f7e5dd043ca91cca736e568abc259a44f6eed80933aa1fc77267518fb3269d41f5e7d30e3aab12c471605c84ba27904ef4e0de0331ac15c170695789b128934bf3e
+[TABLE_B_FULL] 624fe815deeb04911ac7e04d16e37c49d23fd8854edbf4018ab7d0bd86d36cb9422fc8f5becbe471faa7c02df6c35c29b21fb8652ebbd4e16a97b09d66b34c99220fa8d59eabc451da87a00dd6a33c0992ff98450e9bb4c14a77907d46932c7902ef88b57e8ba431ba6780edb6831ce972df7825ee7b94a12a57705d26730c59e2cf68955e6b84119a4760cd9663fcc952bf5805ce5b74810a37503d0653ec39c2af48753e4b64f17a2740ad7643dca9329f38e5ae3b5461ea17301de633cc19a28f28551e2b44d15a07208d5623bc89127f18c58e1b3441caf710fdc613acf9826f0835fe0b24b13ae7006d36039c69f25ff8a56efb1421aad7f0dda6f38cd9
+[*] vs 0x21faca0: tableA=MATCH tableB=MATCH
+=== END CONTEXT DUMP ===
+
+[CIPHER #2] ENTER ctx=0x21faa98 len=472 commit=1 cA=0 cB=0 buf[0:16]=d8019607f5e0744b1d368b854487672f
+[CIPHER #2] LEAVE ctx=0x21faa98 len=472 commit=1 buf_after[0:16]=d994dc55cf4bb4560e6c8bfd50b3039d
+[CIPHER #3] ENTER ctx=0x21faca0 len=2 commit=1 cA=8 cB=0 buf[0:2]=3df0
+[CIPHER #3] LEAVE ctx=0x21faca0 len=2 commit=1 buf_after[0:2]=0c00
+[CIPHER #4] ENTER ctx=0x21faca0 len=10 commit=1 cA=10 cB=0 buf[0:10]=743a21bc57f677980b22
+[CIPHER #4] LEAVE ctx=0x21faca0 len=10 commit=1 buf_after[0:10]=74060600000028000000
+[CIPHER #5] ENTER ctx=0x21faca0 len=2 commit=1 cA=20 cB=0 buf[0:2]=7d74
+[CIPHER #5] LEAVE ctx=0x21faca0 len=2 commit=1 buf_after[0:2]=4401
+[CIPHER #6] ENTER ctx=0x21faca0 len=322 commit=1 cA=22 cB=0 buf[0:16]=395eabeed37e9fa90dca5df4b520d285
+[CIPHER #6] LEAVE ctx=0x21faca0 len=322 commit=1 buf_after[0:16]=65066cee0345ee5ea8c083cde429bf1b
+[CIPHER #7] ENTER ctx=0x21faa98 len=12 commit=1 cA=0 cB=0 buf[0:12]=e85ef5695882ea00b2acf908
+[CIPHER #7] LEAVE ctx=0x21faa98 len=12 commit=1 buf_after[0:12]=da61eab3156d5de2f4c5ac25
+
+=== STAGE 4b SUMMARY ===
+Total custom_cipher calls: 8
+Unique contexts: 2
+  Context 0x21faca0 — calls=6 firstCall=#0 initialCounters=(0,0)
+  Context 0x21faa98 — calls=2 firstCall=#2 initialCounters=(0,0)
+
+Table comparison:
+  0x21faca0 vs 0x21faa98: tableA=IDENTICAL tableB=IDENTICAL
+=== END SUMMARY ===

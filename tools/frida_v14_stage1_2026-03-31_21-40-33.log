@@ -1,0 +1,47 @@
+[*] Frida v14 — Stage 1: BF_cfb64_encrypt observation
+[*] Started: 2026-03-31T19:40:33.873Z
+[*] Log file: F:\Sentinel\tools\frida_v14_stage1_2026-03-31_21-40-33.log
+[*] Target: BF_cfb64_encrypt @ 0x12410f0
+[*] Detailed logging for first 20 calls
+---
+[*] Hook installed! Login now and play for ~30 seconds.
+[*] Before detaching, type: rpc.exports.summary() or just call printSummary()
+[*] Or paste printSummary() in console, then Ctrl+D.
+
+[*] Hook installed! Login now and play for ~30 seconds, then detach (Ctrl+D).
+[*] Summary will print on detach.
+
+[CALL #0] +=119ms enc=0 len=15 num=0 ivec=0000000000000000 ctx=0x205ae5a0 caller=0x1e423ab in[0:15]=d784cfa9ab250106992fd699d25888 backtrace:
+    [0] 0x1e423ab Conquer.exe+1a423ab
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec33 Conquer.exe+beec33
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #0] LEAVE enc=0 out[0:15]=6b0e4f4c1495151bac167652010000
+[CALL #1] +=123ms enc=0 len=338 num=7 ivec=992fd699d25888f1 ctx=0x205ae5a0 caller=0x1e3f18f in[0:16]=ed24c7f133248d08fdea9fd73297aa90 backtrace:
+    [0] 0x1e3f18f Conquer.exe+1a3f18f
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec33 Conquer.exe+beec33
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #1] LEAVE enc=0 out[0:16]=1c0000004f11acff57b754769d7cf7dd
+[CALL #2] +=127ms enc=1 len=167 num=0 ivec=0000000000000000 ctx=0x205ae978 caller=0x1e5088a in[0:16]=5fbe4bf1757e2aa00000000c00000070 backtrace:
+    [0] 0x1e5088a Conquer.exe+1a5088a
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec65 Conquer.exe+beec65
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #2] LEAVE enc=1 out[0:16]=e334cb14cace3ebd69c3c5fa270d5fcf
+
+=== STAGE 1 SUMMARY ===
+Total BF_cfb64_encrypt calls (P0 match): 3
+Unique callers: 3
+
+  Caller: 0x1e423ab (Conquer.exe+1a423ab) — total=1 enc=1(encrypt)=0 enc=0(decrypt)=1
+  Caller: 0x1e3f18f (Conquer.exe+1a3f18f) — total=1 enc=1(encrypt)=0 enc=0(decrypt)=1
+  Caller: 0x1e5088a (Conquer.exe+1a5088a) — total=1 enc=1(encrypt)=1 enc=0(decrypt)=0
+
+=== END SUMMARY ===

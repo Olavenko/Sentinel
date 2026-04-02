@@ -1,0 +1,30 @@
+[*] Frida v14 — Stage 1: BF_cfb64_encrypt observation
+[*] Started: 2026-03-31T19:33:37.115Z
+[*] Log file: F:\Sentinel\tools\frida_v14_stage1_2026-03-31_21-33-37.log
+[*] Target: BF_cfb64_encrypt @ 0x12410f0
+[*] Detailed logging for first 20 calls
+---
+[CALL #0] +=134ms enc=0 len=15 num=0 ivec=0000000000000000 ctx=0x1796e5a0 caller=0x1e423ab in[0:15]=a508b03a936d04ef340429bdb33890 backtrace:
+    [0] 0x1e423ab Conquer.exe+1a423ab
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec33 Conquer.exe+beec33
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #0] LEAVE enc=0 out[0:15]=198230df2cdd10f220154244010000
+[CALL #1] +=135ms enc=0 len=324 num=7 ivec=340429bdb3389021 ctx=0x1796e5a0 caller=0x1e3f18f in[0:16]=2f9a3c2777ecd29c8594f0c6114455d9 backtrace:
+    [0] 0x1e3f18f Conquer.exe+1a3f18f
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec33 Conquer.exe+beec33
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #1] LEAVE enc=0 out[0:16]=0e00000097e532f147db76c3a18b12c9
+[CALL #2] +=138ms enc=1 len=166 num=0 ivec=0000000000000000 ctx=0x1796e978 caller=0x1e5088a in[0:16]=fb6e03d47106fa9f0000000b0000003d backtrace:
+    [0] 0x1e5088a Conquer.exe+1a5088a
+    [1] 0x12410f0 Conquer.exe+e410f0
+    [2] 0xfeec65 Conquer.exe+beec65
+    [3] 0xfee80d Conquer.exe+bee80d
+    [4] 0xe42ecb Conquer.exe+a42ecb
+    [5] 0x76c8e9eb ucrtbase.dll+7e9eb
+[CALL #2] LEAVE enc=1 out[0:16]=47e48331ceb6ee82bb3cfb7676f49379

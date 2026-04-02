@@ -1,0 +1,40 @@
+[*] Frida v18 — Stage 5b: Send Counter Investigation
+[*] Started: 2026-03-31T21:15:26.788Z
+[*] Log file: F:\Sentinel\tools\frida_v18_stage5b_2026-03-31_23-15-26.log
+---
+[*] Hook installed! Login and play ~30 seconds.
+[*] Type printSummary() before detaching.
+
+[CALL #0] ENTER ctx=0x2214ab0 len=2 commit=1 cA=0 cB=0 buf[0:2]=c548
+[CALL #0] LEAVE ctx=0x2214ab0 cA=0->2 cB=0->0 changed=true expected=(2,0) match=true
+[CALL #1] ENTER ctx=0x2214ab0 len=6 commit=1 cA=2 cB=0 buf[0:6]=691261743bcd
+[CALL #1] LEAVE ctx=0x2214ab0 cA=2->8 cB=0->0 changed=true expected=(8,0) match=true
+[CALL #2] ENTER ctx=0x22148a8 len=472 commit=1 cA=0 cB=0 buf[0:16]=d8019607417c0f187a63c44d7992739b
+[CALL #2] LEAVE ctx=0x22148a8 cA=0->216 cB=0->1 changed=true expected=(216,1) match=true
+[CALL #3] ENTER ctx=0x2214ab0 len=2 commit=1 cA=8 cB=0 buf[0:2]=3df0
+[CALL #3] LEAVE ctx=0x2214ab0 cA=8->10 cB=0->0 changed=true expected=(10,0) match=true
+[CALL #4] ENTER ctx=0x2214ab0 len=10 commit=1 cA=10 cB=0 buf[0:10]=743a21bc57f677980b22
+[CALL #4] LEAVE ctx=0x2214ab0 cA=10->20 cB=0->0 changed=true expected=(20,0) match=true
+[CALL #5] ENTER ctx=0x2214ab0 len=2 commit=1 cA=20 cB=0 buf[0:2]=7d74
+[CALL #5] LEAVE ctx=0x2214ab0 cA=20->22 cB=0->0 changed=true expected=(22,0) match=true
+[CALL #6] ENTER ctx=0x2214ab0 len=322 commit=1 cA=22 cB=0 buf[0:16]=395e39f80adbe9e58dbe06a5ddf17883
+[CALL #6] LEAVE ctx=0x2214ab0 cA=22->88 cB=0->1 changed=true expected=(88,1) match=true
+[CALL #7] ENTER ctx=0x22148a8 len=12 commit=1 cA=0 cB=0 buf[0:12]=482c142b5882ea0010dc1751
+[CALL #7] LEAVE ctx=0x22148a8 cA=0->12 cB=0->0 changed=true expected=(12,0) match=true
+
+=== STAGE 5b SUMMARY ===
+Unique contexts: 2
+
+Context 0x2214ab0 (6 calls):
+  #0 len=2 commit=1 counters: (0,0) -> (2,0)
+  #1 len=6 commit=1 counters: (2,0) -> (8,0)
+  #3 len=2 commit=1 counters: (8,0) -> (10,0)
+  #4 len=10 commit=1 counters: (10,0) -> (20,0)
+  #5 len=2 commit=1 counters: (20,0) -> (22,0)
+  #6 len=322 commit=1 counters: (22,0) -> (88,1)
+
+Context 0x22148a8 (2 calls):
+  #2 len=472 commit=1 counters: (0,0) -> (216,1)
+  #7 len=12 commit=1 counters: (0,0) -> (12,0)
+
+=== END SUMMARY ===

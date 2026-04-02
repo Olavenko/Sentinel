@@ -1,0 +1,68 @@
+[*] Frida v15 — Stage 4: Gameplay Cipher Table Extraction
+[*] Started: 2026-03-31T20:49:10.319Z
+[*] Log file: F:\Sentinel\tools\frida_v15_stage4_2026-03-31_22-49-10.log
+[*] Target: FUN_00fef18a @ 0xfef18a
+---
+[*] Hooks installed! Login and play for ~30 seconds.
+[*] Tables will be dumped on first custom_cipher call.
+[*] Type printSummary() before detaching.
+
+[CIPHER #0] ENTER ctx=0x2210b60 len=2 commit=1 counterA=0 counterB=0 buf[0:2]=c548
+
+=== CIPHER CONTEXT FOUND ===
+[*] Cipher ctx address: 0x2210b60
+[*] counterA: 0
+[*] counterB: 0
+
+[TABLE_A] (ctx+0x08, 256 bytes):
+  [A+000] 9d90838ad18ce7f62528eb8299648f2e2d40d3fae1bcb7e6b5d83bf2a9945f1e
+  [A+020] bdf0236af1ec87d645888b62b9c42f0e4da073da011c57c6d538dbd2c9f4fffe
+  [A+040] dd50c34a114c27b665e82b42d924cfee6d0013ba217cf7a6f5987bb2e9549fde
+  [A+060] fdb0632a31acc7968548cb22f9846fce8d60b39a41dc978615f81b9209b43fbe
+  [A+080] 1d10030a510c6776a5a86b0219e40faeadc0537a613c37663558bb722914df9e
+  [A+0a0] 3d70a3ea716c0756c5080be23944af8ecd20f35a819cd74655b85b5249747f7e
+  [A+0c0] 5dd043ca91cca736e568abc259a44f6eed80933aa1fc77267518fb3269d41f5e
+  [A+0e0] 7d30e3aab12c471605c84ba27904ef4e0de0331ac15c170695789b128934bf3e
+
+[TABLE_B] (ctx+0x108, 256 bytes):
+  [B+000] 624fe815deeb04911ac7e04d16e37c49d23fd8854edbf4018ab7d0bd86d36cb9
+  [B+020] 422fc8f5becbe471faa7c02df6c35c29b21fb8652ebbd4e16a97b09d66b34c99
+  [B+040] 220fa8d59eabc451da87a00dd6a33c0992ff98450e9bb4c14a77907d46932c79
+  [B+060] 02ef88b57e8ba431ba6780edb6831ce972df7825ee7b94a12a57705d26730c59
+  [B+080] e2cf68955e6b84119a4760cd9663fcc952bf5805ce5b74810a37503d0653ec39
+  [B+0a0] c2af48753e4b64f17a2740ad7643dca9329f38e5ae3b5461ea17301de633cc19
+  [B+0c0] a28f28551e2b44d15a07208d5623bc89127f18c58e1b3441caf710fdc613acf9
+  [B+0e0] 826f0835fe0b24b13ae7006d36039c69f25ff8a56efb1421aad7f0dda6f38cd9
+
+[TABLE_A_FULL] 9d90838ad18ce7f62528eb8299648f2e2d40d3fae1bcb7e6b5d83bf2a9945f1ebdf0236af1ec87d645888b62b9c42f0e4da073da011c57c6d538dbd2c9f4fffedd50c34a114c27b665e82b42d924cfee6d0013ba217cf7a6f5987bb2e9549fdefdb0632a31acc7968548cb22f9846fce8d60b39a41dc978615f81b9209b43fbe1d10030a510c6776a5a86b0219e40faeadc0537a613c37663558bb722914df9e3d70a3ea716c0756c5080be23944af8ecd20f35a819cd74655b85b5249747f7e5dd043ca91cca736e568abc259a44f6eed80933aa1fc77267518fb3269d41f5e7d30e3aab12c471605c84ba27904ef4e0de0331ac15c170695789b128934bf3e
+[TABLE_B_FULL] 624fe815deeb04911ac7e04d16e37c49d23fd8854edbf4018ab7d0bd86d36cb9422fc8f5becbe471faa7c02df6c35c29b21fb8652ebbd4e16a97b09d66b34c99220fa8d59eabc451da87a00dd6a33c0992ff98450e9bb4c14a77907d46932c7902ef88b57e8ba431ba6780edb6831ce972df7825ee7b94a12a57705d26730c59e2cf68955e6b84119a4760cd9663fcc952bf5805ce5b74810a37503d0653ec39c2af48753e4b64f17a2740ad7643dca9329f38e5ae3b5461ea17301de633cc19a28f28551e2b44d15a07208d5623bc89127f18c58e1b3441caf710fdc613acf9826f0835fe0b24b13ae7006d36039c69f25ff8a56efb1421aad7f0dda6f38cd9
+
+=== TABLES DUMPED ===
+[CIPHER #0] LEAVE len=2 commit=1 buf_after[0:2]=0800
+[CIPHER #1] ENTER ctx=0x2210b60 len=6 commit=1 counterA=2 counterB=0 buf[0:6]=6912155113fd
+[CIPHER #1] LEAVE len=6 commit=1 buf_after[0:6]=2304c150c23d
+[CIPHER #2] ENTER ctx=0x2210958 len=472 commit=1 counterA=0 counterB=0 buf[0:16]=d80196078d999496127cc6d4988e855c
+[CIPHER #2] LEAVE len=472 commit=1 buf_after[0:16]=d994dc5548dcba8bfec85fe89d232daa
+[CIPHER #3] ENTER ctx=0x2210b60 len=2 commit=1 counterA=8 counterB=0 buf[0:2]=3df0
+[CIPHER #3] LEAVE len=2 commit=1 buf_after[0:2]=0c00
+[CIPHER #4] ENTER ctx=0x2210b60 len=10 commit=1 counterA=10 counterB=0 buf[0:10]=743a21bc57f677980b22
+[CIPHER #4] LEAVE len=10 commit=1 buf_after[0:10]=74060600000028000000
+[CIPHER #5] ENTER ctx=0x2210b60 len=2 commit=1 counterA=20 counterB=0 buf[0:2]=7d74
+[CIPHER #5] LEAVE len=2 commit=1 buf_after[0:2]=4401
+[CIPHER #6] ENTER ctx=0x2210b60 len=322 commit=1 counterA=22 counterB=0 buf[0:16]=395e54f3a9d64d1bda7f7c23059f60ae
+[CIPHER #6] LEAVE len=322 commit=1 buf_after[0:16]=6506933fa4cfc375d59b91b0efd294a9
+[CIPHER #7] ENTER ctx=0x2210958 len=12 commit=1 counterA=0 counterB=0 buf[0:12]=501b00615882ea0060936134
+[CIPHER #7] LEAVE len=12 commit=1 buf_after[0:12]=5135b533156d5de2d93625e6
+[*] BF_KEY found at: 0x2046e5a0
+[*] Socket base (estimated): 0x2046d558
+[*] Connection type (socket+0x1C08): 0
+
+=== STAGE 4 SUMMARY ===
+Total custom_cipher calls: 8
+Cipher ctx address: 0x2210b60
+Socket base address: 0x2046d558
+Cipher ctx socket offset: socket + 0xe1da3608
+Final counterA: 0
+Final counterB: 0
+Total bytes processed estimate: 0
+=== END SUMMARY ===

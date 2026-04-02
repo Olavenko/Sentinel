@@ -1,0 +1,9 @@
+[*] Frida v16 — Stage 4b: Multi-Context Table Comparison
+[*] Started: 2026-03-31T20:53:57.004Z
+[*] Log file: F:\Sentinel\tools\frida_v15_stage4_2026-03-31_22-53-57.log
+---
+[*] Hook installed! Login, play ~30 seconds, then printSummary() + Ctrl+D.
+
+[*] Tables will be dumped on first custom_cipher call.
+[*] Type printSummary() before detaching.
+

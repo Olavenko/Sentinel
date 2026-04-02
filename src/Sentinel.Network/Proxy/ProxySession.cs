@@ -24,7 +24,11 @@ public sealed class ProxySession : IProxySession
     private readonly ILogger<ProxySession> _logger;
     private readonly string _endpointName;
     private readonly bool _enableMitm;
+    private readonly bool _enableGameplayDecrypt;
     private readonly Func<bool, ICipher>? _handshakeCipherFactory;
+
+    // Read-only gameplay decryption state (null when not in this mode)
+    private GameplaySessionState? _gameplayState;
 
     private long _bytesToServer;
     private long _bytesToClient;
@@ -56,7 +60,8 @@ public sealed class ProxySession : IProxySession
         ILogger<ProxySession> logger,
         string endpointName,
         bool enableMitm = false,
-        Func<bool, ICipher>? handshakeCipherFactory = null)
+        Func<bool, ICipher>? handshakeCipherFactory = null,
+        bool enableGameplayDecrypt = false)
     {
         _client = client;
         _server = server;
@@ -65,6 +70,7 @@ public sealed class ProxySession : IProxySession
         _endpointName = endpointName;
         _enableMitm = enableMitm;
         _handshakeCipherFactory = handshakeCipherFactory;
+        _enableGameplayDecrypt = enableGameplayDecrypt;
     }
 
     public async Task RunAsync(CancellationToken cancellationToken = default)
@@ -95,6 +101,10 @@ public sealed class ProxySession : IProxySession
                     DisposeCiphers();
                 }
             }
+
+            // Initialise read-only gameplay decryption (only when MITM is not active)
+            if (_enableGameplayDecrypt && !_enableMitm)
+                _gameplayState = new GameplaySessionState();
 
             var clientToServer = ForwardAsync(
                 clientStream, serverStream,
@@ -225,6 +235,79 @@ public sealed class ProxySession : IProxySession
 
                             encryptCipher.Encrypt(mutable);
                             await destination.WriteAsync(mutable, ct);
+                        }
+                        else if (_gameplayState is not null)
+                        {
+                            // Read-only gameplay decrypt mode:
+                            // always forward the original encrypted bytes; log a decrypted copy.
+                            if (_gameplayState.Phase == SessionPhase.Handshake)
+                            {
+                                bool switched = _gameplayState.OnHandshakeMessage(direction, segment.Length);
+                                _logger.LogInformation(
+                                    "[{Endpoint}] Session {Id:N8} — Handshake msg: {Dir} {Size} bytes (C2S={C2S}, S2C={S2C})",
+                                    _endpointName, Id.ToString()[..8], dirLabel, segment.Length,
+                                    _gameplayState.ClientToServerCount, _gameplayState.ServerToClientCount);
+                                if (switched)
+                                    _logger.LogInformation(
+                                        "[{Endpoint}] Session {Id:N8} — Handshake complete, switching to gameplay decryption (total handshake: C2S={C2SBytes} bytes, S2C={S2CBytes} bytes)",
+                                        _endpointName, Id.ToString()[..8],
+                                        _gameplayState.TotalClientToServerBytes,
+                                        _gameplayState.TotalServerToClientBytes);
+
+                                // Handshake messages pass through as-is (log raw bytes)
+                                try
+                                {
+                                    await _packetLogger.LogPacketAsync(Id, direction, segment, timestamp);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarning(ex,
+                                        "[{Endpoint}] {Dir} packet logging failed ({Bytes} bytes)",
+                                        _endpointName, dirLabel, segment.Length);
+                                }
+                            }
+                            else
+                            {
+                                // Gameplay phase: decrypt a copy for the log, forward the original
+                                var copy = segment.ToArray();
+                                if (direction == PacketDirection.ServerToClient)
+                                {
+                                    int cA = _gameplayState.RecvCounterA;
+                                    int cB = _gameplayState.RecvCounterB;
+                                    ConquerCipher.Transform(copy, 0, copy.Length, ref cA, ref cB);
+                                    _gameplayState.RecvCounterA = cA;
+                                    _gameplayState.RecvCounterB = cB;
+                                }
+                                else
+                                {
+                                    int cA = 0, cB = 0;
+                                    ConquerCipher.Transform(copy, 0, copy.Length, ref cA, ref cB);
+                                }
+
+                                // DEBUG: show first 8 bytes of original vs decrypted
+                                if (copy.Length >= 8)
+                                {
+                                    _logger.LogDebug(
+                                        "[{Endpoint}] {Dir} DECRYPT CHECK — original: {Orig} → decrypted: {Dec}",
+                                        _endpointName, dirLabel,
+                                        BitConverter.ToString(segment.ToArray(), 0, Math.Min(8, segment.Length)),
+                                        BitConverter.ToString(copy, 0, Math.Min(8, copy.Length)));
+                                }
+
+                                try
+                                {
+                                    await _packetLogger.LogPacketAsync(Id, direction, copy, timestamp);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarning(ex,
+                                        "[{Endpoint}] {Dir} packet logging failed ({Bytes} bytes)",
+                                        _endpointName, dirLabel, segment.Length);
+                                }
+                            }
+
+                            // Always forward the original encrypted segment
+                            await destination.WriteAsync(segment, ct);
                         }
                         else
                         {

@@ -90,7 +90,8 @@ public sealed class ProxyServer : IProxyServer
 
             session = new ProxySession(
                 client, server, _packetLogger, _sessionLogger,
-                _config.Name, _config.EnableMitm, _handshakeCipherFactory);
+                _config.Name, _config.EnableMitm, _handshakeCipherFactory,
+                _config.EnableGameplayDecrypt);
 
             _sessions.TryAdd(session.Id, session);
             SessionStarted?.Invoke(session);
