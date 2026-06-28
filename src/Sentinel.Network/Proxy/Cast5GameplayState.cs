@@ -9,16 +9,19 @@ namespace Sentinel.Network.Proxy;
 /// <summary>
 /// Read-only port-19000 CAST5-variant gameplay decryption state for one session.
 /// <para>
-/// The proxy forwards the original encrypted bytes untouched; this class observes
-/// a copy per direction for logging only. Because decryption is decoupled from
+/// The proxy forwards the original encrypted bytes untouched; this class observes a
+/// copy per direction for logging only. Because decryption is decoupled from
 /// forwarding, the connection never blocks on the key: each direction buffers its
-/// ciphertext from connection start, and when the keyfeed key lands it seeds the
-/// cipher at that direction's switch offset, re-decrypts the buffered run, and
-/// validates the first packet (2-byte LE length prefix → 8-byte <c>TQClient</c>/
-/// <c>TQServer</c> seal). On success it emits the caught-up plaintext, drops the
-/// buffer, and decrypts subsequent chunks live. The pre-switch static-handshake
-/// bytes are dropped (they are the DH negotiation, not gameplay). If no valid key
-/// arrives within the buffer cap, it falls back to raw passthrough with a warning.
+/// ciphertext from connection start, and when keys are available it CONTENT-MATCHES —
+/// trying each candidate key (one per live game client) at that key's per-direction
+/// switch offset and latching the one whose first packet validates (2-byte LE length
+/// prefix → 8-byte <c>TQClient</c>/<c>TQServer</c> seal). This binds the connection to
+/// the right account's key with no PID/socket correlation. Once either direction
+/// commits, the other is restricted to that same key (both belong to one DH session).
+/// On commit it emits the caught-up plaintext, drops the buffer, and decrypts
+/// subsequent chunks live. The pre-switch static-handshake bytes are dropped (they are
+/// the DH negotiation, not gameplay). If no candidate validates before the buffer cap,
+/// it falls back to raw passthrough with a warning.
 /// </para>
 /// </summary>
 public sealed class Cast5GameplayState : IDisposable
@@ -39,6 +42,12 @@ public sealed class Cast5GameplayState : IDisposable
 
     private readonly DirectionState _send;
     private readonly DirectionState _recv;
+
+    // The schedule-content id (GameSessionKey.ScheduleId) the FIRST direction to
+    // validate committed to. Once set, the other direction is restricted to this key —
+    // both directions belong to one DH session and must never latch different
+    // candidates. Written/read from the two ForwardAsync threads → volatile.
+    private volatile string? _committedScheduleId;
 
     public Cast5GameplayState(IGameSessionKeyProvider keys, ILogger logger, string endpoint, string idTag)
     {
@@ -73,54 +82,67 @@ public sealed class Cast5GameplayState : IDisposable
         // Pre-commit: accumulate the ciphertext stream from connection start.
         d.Buffer.AddRange(ciphertext);
 
-        var key = _keys.Current;
-        if (key is null || !key.IsDirectionReady(direction))
-            return GuardCap(d);                          // no usable key for this direction yet
-        if (key.SessionId == d.RejectedSession)
-            return GuardCap(d);                          // this key already failed for this stream
+        // Content-match against every live candidate key: try each not-yet-rejected
+        // key at ITS own per-direction switch offset and latch the one whose first
+        // packet validates (length → seal). Once either direction has committed to a
+        // key, restrict this direction to that same key (one DH session per connection).
+        var committedId = _committedScheduleId;
 
-        var (ivec, num, offsetN) = key.ForDirection(direction);
-        var offset = (int)offsetN!.Value;
-
-        if (d.Buffer.Count < offset + 2)
-            return GuardCap(d);                          // not yet at the DH stream start + length prefix
-
-        // Decrypt buffer[offset..] with a fresh, correctly-seeded cipher and
-        // validate the first packet. Re-run per chunk until it commits.
-        var run = new byte[d.Buffer.Count - offset];
-        d.Buffer.CopyTo(offset, run, 0, run.Length);
-
-        var cipher = new Cast5VariantCfb64Cipher(encrypting: false);
-        cipher.SetRawState(key.Schedule);
-        cipher.SetIv(ivec!);
-        cipher.SetNum(num);
-        cipher.Decrypt(run);
-
-        switch (Validate(run, d.Seal))
+        foreach (var key in _keys.Candidates)
         {
-            case Verdict.Pending:
-                cipher.Dispose();
-                return GuardCap(d);                      // need more bytes for the first packet + seal
+            if (committedId is not null && key.ScheduleId != committedId)
+                continue;                                // restricted to the session's committed key
+            if (d.Rejected.Contains(key.ScheduleId))
+                continue;                                // already proven wrong for this stream
+            if (!key.IsDirectionReady(direction))
+                continue;                                // this direction's ivec/offset not captured yet
 
-            case Verdict.Invalid:
-                cipher.Dispose();
-                d.RejectedSession = key.SessionId;       // wrong key for this stream; stop retrying it
-                _logger.LogDebug(
-                    "[{Endpoint}] Session {Id} — CAST5 {Dir} key {Session} did not validate; awaiting a new key",
-                    _endpoint, _idTag, Label(direction), key.SessionId);
-                return GuardCap(d);
+            var (ivec, num, offsetN) = key.ForDirection(direction);
+            var offset = (int)offsetN!.Value;
+            if (d.Buffer.Count < offset + 2)
+                continue;                                // not enough buffered to test this candidate yet
 
-            default: // Verdict.Valid → commit
-                d.Cipher = cipher;                       // already positioned at the end of the buffered run
-                d.Committed = true;
-                var caughtUp = run.Length;
-                d.Buffer.Clear();
-                d.Buffer.TrimExcess();
-                _logger.LogInformation(
-                    "[{Endpoint}] Session {Id} — CAST5 {Dir} decrypt ENGAGED at offset {Offset} (session {Session}, {Bytes} bytes caught up)",
-                    _endpoint, _idTag, Label(direction), offset, key.SessionId, caughtUp);
-                return run;
+            // Decrypt buffer[offset..] with a fresh, correctly-seeded cipher and
+            // validate the first packet.
+            var run = new byte[d.Buffer.Count - offset];
+            d.Buffer.CopyTo(offset, run, 0, run.Length);
+
+            var cipher = new Cast5VariantCfb64Cipher(encrypting: false);
+            cipher.SetRawState(key.Schedule);
+            cipher.SetIv(ivec!);
+            cipher.SetNum(num);
+            cipher.Decrypt(run);
+
+            switch (Validate(run, d.Seal))
+            {
+                case Verdict.Pending:
+                    cipher.Dispose();
+                    continue;                            // needs more bytes; keep this candidate in play
+
+                case Verdict.Invalid:
+                    cipher.Dispose();
+                    d.Rejected.Add(key.ScheduleId);      // wrong key for this stream; never retry it
+                    _logger.LogDebug(
+                        "[{Endpoint}] Session {Id} — CAST5 {Dir} candidate {Session} (pid {Pid}) did not validate; trying others",
+                        _endpoint, _idTag, Label(direction), key.SessionId, key.Pid);
+                    continue;
+
+                default: // Verdict.Valid → commit
+                    d.Cipher = cipher;                   // already positioned at the end of the buffered run
+                    d.Committed = true;
+                    _committedScheduleId = key.ScheduleId; // restrict the other direction to this key
+                    var caughtUp = run.Length;
+                    d.Buffer.Clear();
+                    d.Buffer.TrimExcess();
+                    _logger.LogInformation(
+                        "[{Endpoint}] Session {Id} — CAST5 {Dir} decrypt ENGAGED at offset {Offset} (session {Session}, pid {Pid}, {Bytes} bytes caught up)",
+                        _endpoint, _idTag, Label(direction), offset, key.SessionId, key.Pid, caughtUp);
+                    return run;
+            }
         }
+
+        // No candidate validated this round — keep buffering (or fall back at the cap).
+        return GuardCap(d);
     }
 
     private byte[]? GuardCap(DirectionState d)
@@ -168,7 +190,9 @@ public sealed class Cast5GameplayState : IDisposable
         public List<byte> Buffer { get; } = [];
         public bool Committed { get; set; }
         public bool Fallback { get; set; }
-        public string? RejectedSession { get; set; }
+        // ScheduleIds (schedule-content hashes) proven wrong for THIS direction's stream.
+        // Per-direction, touched only by that direction's thread — no lock needed.
+        public HashSet<string> Rejected { get; } = [];
         public Cast5VariantCfb64Cipher? Cipher { get; set; }
     }
 }
