@@ -44,6 +44,13 @@ public sealed class GameSessionKeyProvider : IGameSessionKeyProvider, IDisposabl
 
     public IReadOnlyCollection<GameSessionKey> Candidates => _byPid.Values.ToArray();
 
+    /// <summary>
+    /// The resolved <c>keys\</c> directory being watched. Exposed so the keyfeed supervisor reaps
+    /// the exact same <c>game-session-&lt;pid&gt;.key.json</c> files this provider loads (one source
+    /// of truth for the directory derivation).
+    /// </summary>
+    public string KeysDirectory => _dir;
+
     public event Action<GameSessionKey>? KeyChanged;
 
     public GameSessionKeyProvider(string path, ILogger<GameSessionKeyProvider> logger)
