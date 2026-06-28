@@ -262,9 +262,14 @@ Connected GhidraMCP to Claude Code. Bridge: Claude Code (MCP client) → Python 
 
 Four dedicated gameplay sessions captured and analysed (idle 31 KB, walk 37 KB, attack 78 KB, chat 28 KB).
 
-**Encryption confirmed: Blowfish CFB64**
-- Separate streaming cipher state per direction
-- `BF_cfb64_encrypt` (OpenSSL), segment size = 64 bits, initial IV = 8 zero bytes
+**Encryption — port 19000 game stream: CORRECTED 2026-06-27**
+
+> ⚠ The original session-2 finding here read "Blowfish CFB64." That was a **misidentification** — CAST5-CFB64 mimics Blowfish-CFB64's 64-bit-block/CFB64 shape (key@ctx+0x40, ivec@ctx+0x15). See the canonical finding below.
+
+- Separate streaming cipher state per direction (running `ivec` + `num`; separate send/recv keys)
+- CFB64 stream, 8-byte block, session IV from the handshake
+
+**Canonical finding — port 19000 game cipher (confirmed 2026-06-27):** TQ-customized **CAST5 (CAST-128) in CFB64 mode**. Uses the RFC-2144 CAST5 S-box *values* and CAST5's f1/f2/f3 round structure, key-dependent 5-bit rotations, and 12/16-round flag, driven as a CFB64 stream (8-byte block; per-direction running `ivec` + `num`; separate send/recv keys). **Not stock CAST5** — S-box lookups carry a −1 index offset (TQ customization), so OpenSSL `cast5-cfb` will not decrypt it directly. Implementation: CFB64 driver `FUN_01254810` @ `0x01254810`; CAST5 block `FUN_01266300` @ `0x01266300`; S-boxes at base `0x0171E034` (read from `0x0171E030` for the −1 offset); ctx layout key/schedule@`+0x40`, ivec@`+0x15`, num@`+0x08`. Proven by standalone out-of-game reproduction of three live packets across both directions and both keys, including a `SENTINELPROBE123` known-plaintext capture.
 
 **Key exchange: DH, session-unique**
 - Hardcoded key `"DR654dt34trg4UI6"` does NOT decrypt traffic — DH is active
@@ -305,7 +310,7 @@ Full tables in `reports/session_02_report.md`.
 
 **All remaining Phase 2 work (type IDs, field offsets, PROTOCOL.md) requires plaintext packets.**
 
-Sentinel must perform a DH man-in-the-middle: intercept the DH handshake, compute two shared secrets (one with the client, one with the server), and maintain four Blowfish states to decrypt/re-encrypt both directions transparently.
+Sentinel must perform a DH man-in-the-middle: intercept the DH handshake, compute two shared secrets (one with the client, one with the server), and maintain four CAST5-variant CFB64 cipher states (see canonical finding above — *not* Blowfish) to decrypt/re-encrypt both directions transparently.
 
 **Decision: implement DH MITM as Step 11 (Phase 3 early) before continuing Phase 2 analysis.**
 
@@ -329,7 +334,7 @@ Implement Diffie-Hellman man-in-the-middle in `ProxySession` and `Sentinel.Crypt
 ```
 CO Client ◀──────────────────────────── Sentinel ────────────────────────────▶ Real Server
           SharedSecret_A (Client↔Proxy)           SharedSecret_B (Proxy↔Server)
-          BF_C2S_A  BF_S2C_A                      BF_C2S_B  BF_S2C_B
+          C5_C2S_A  C5_S2C_A                      C5_C2S_B  C5_S2C_B   (CAST5-variant CFB64, not Blowfish)
 ```
 
 **What to build:**
@@ -337,9 +342,9 @@ CO Client ◀──────────────────────�
 | File | What It Does |
 |------|-------------|
 | `Sentinel.Crypto/DiffieHellman.cs` | Wrap `System.Security.Cryptography.DH` or BouncyCastle `DHParameters`. Parse P/G from the server's handshake packet. Generate ephemeral keypair. Compute shared secret. |
-| `Sentinel.Crypto/BlowfishCfb64Cipher.cs` | Concrete `ICipher` — Blowfish CFB64 via BouncyCastle. Stateful streaming. |
+| `Sentinel.Crypto/BlowfishCfb64Cipher.cs` *(misnamed — rename pending)* | Concrete `ICipher` for the port-19000 stream. **NOTE:** the cipher is a **CAST5-variant CFB64, not Blowfish** — this existing class needs renaming (e.g. `Cast5VariantCfb64Cipher`) in a **separate code task** (rebuild + tests). Stock BouncyCastle CAST5 won't work directly because of the −1 S-box offset; a custom transform is required. Stateful streaming. |
 | `Sentinel.Crypto/TqKeyExchange.cs` | Concrete `IKeyExchange` — parses `CHandshake` from S→C, rebuilds it with a new pubkey for the client, parses `CHandshakeReply` from C→S, rebuilds it with a new pubkey for the server. Sets per-direction IVs from `ClientIvec` / `ServerIvec` in the handshake. |
-| `Sentinel.Network/Proxy/ProxySession.cs` | After handshake completes: decrypt each inbound chunk before logging, re-encrypt before forwarding. Four Blowfish states total (C→S×2, S→C×2). |
+| `Sentinel.Network/Proxy/ProxySession.cs` | After handshake completes: decrypt each inbound chunk before logging, re-encrypt before forwarding. Four CAST5-variant CFB64 cipher states total (C→S×2, S→C×2). |
 
 **Handshake packet format (from gProxy reference):**
 

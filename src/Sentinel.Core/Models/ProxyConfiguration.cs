@@ -27,6 +27,27 @@ public sealed class ProxyEndpointConfig
     /// <see cref="EnableMitm"/>; if both are set, MITM takes precedence.
     /// </summary>
     public bool EnableGameplayDecrypt { get; set; }
+
+    /// <summary>
+    /// When <see cref="EnableGameplayDecrypt"/> is set, indicates the connection's cipher is
+    /// active from the very first byte, with no DH handshake to skip. This is the case for the
+    /// CO 7xxx Auth connection (port 80), where the dual-table cipher starts immediately at
+    /// counters (0, 0). When <see langword="false"/>, the session passes the handshake messages
+    /// through unchanged and only begins decrypting once the handshake completes.
+    /// </summary>
+    public bool CipherActiveFromStart { get; set; }
+
+    /// <summary>
+    /// Whether to apply the port-19000 TQ-customized CAST5-variant CFB64 cipher to gameplay
+    /// packets for read-only decryption logging, seeded from the live Frida keyfeed file
+    /// (see <see cref="ProxyConfiguration.GameSessionKeyPath"/>). The original encrypted bytes
+    /// are always forwarded unchanged — only the logged copy is decrypted. Independent of, and
+    /// not to be combined with, <see cref="EnableGameplayDecrypt"/> (the dual-table port-80
+    /// cipher) or <see cref="EnableMitm"/>; if MITM is also set, MITM takes precedence.
+    /// The session buffers each direction until the keyfeed key lands, then begins decrypting
+    /// at the captured static→DH switch offset.
+    /// </summary>
+    public bool EnableCast5GameplayDecrypt { get; set; }
 }
 
 /// <summary>
@@ -51,6 +72,14 @@ public sealed class ProxyConfiguration
     /// Extend the table by running tools/frida/capture-keystream.js against the game process.
     /// </summary>
     public string HandshakeChainTablePath { get; set; } = "resources/handshake-chain-table.json";
+
+    /// <summary>
+    /// Path to the live Frida keyfeed file for the port-19000 CAST5-variant gameplay cipher
+    /// (written by <c>tools/frida_v22_keyfeed.js</c>). Consumed by endpoints with
+    /// <see cref="ProxyEndpointConfig.EnableCast5GameplayDecrypt"/> set. Absolute, or relative
+    /// to the application base directory. The file is watched and reloaded on each new session.
+    /// </summary>
+    public string GameSessionKeyPath { get; set; } = "keys/game-session.key.json";
 
     /// <summary>
     /// Console output verbosity: "minimal", "normal", or "verbose".

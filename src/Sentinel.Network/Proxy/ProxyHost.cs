@@ -4,6 +4,7 @@ using Sentinel.Core.Interfaces;
 using Sentinel.Core.Models;
 using Sentinel.Crypto;
 using Sentinel.Crypto.Interfaces;
+using Sentinel.Network.Keys;
 
 namespace Sentinel.Network.Proxy;
 
@@ -15,13 +16,15 @@ public sealed class ProxyHost : IAsyncDisposable
     private readonly List<ProxyServer> _servers;
     private readonly string _consoleVerbosity;
     private readonly ILogger<ProxyHost> _logger;
+    private readonly GameSessionKeyProvider? _keyProvider;
 
     public ProxyHost(
         IOptions<ProxyConfiguration> config,
         IPacketLogger packetLogger,
         ILogger<ProxySession> sessionLogger,
         ILogger<ProxyServer> serverLogger,
-        ILogger<ProxyHost> logger)
+        ILogger<ProxyHost> logger,
+        ILogger<GameSessionKeyProvider> keyLogger)
     {
         var cfg = config.Value;
 
@@ -38,8 +41,14 @@ public sealed class ProxyHost : IAsyncDisposable
             ? encrypting => new ChainTableCfb64Cipher(chainTable, encrypting)
             : null;
 
+        // The port-19000 CAST5 gameplay decrypt path is seeded from the live Frida keyfeed
+        // file; create one shared watcher when any endpoint enables it.
+        _keyProvider = cfg.Endpoints.Any(e => e.EnableCast5GameplayDecrypt)
+            ? new GameSessionKeyProvider(cfg.GameSessionKeyPath, keyLogger)
+            : null;
+
         _servers = cfg.Endpoints
-            .Select(ep => new ProxyServer(ep, packetLogger, sessionLogger, serverLogger, factory))
+            .Select(ep => new ProxyServer(ep, packetLogger, sessionLogger, serverLogger, factory, _keyProvider))
             .ToList();
         _consoleVerbosity = (cfg.ConsoleVerbosity ?? "minimal").ToLowerInvariant();
         _logger = logger;
@@ -114,5 +123,7 @@ public sealed class ProxyHost : IAsyncDisposable
     {
         foreach (var server in _servers)
             await server.DisposeAsync();
+
+        _keyProvider?.Dispose();
     }
 }

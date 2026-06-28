@@ -27,8 +27,21 @@ namespace Sentinel.Network.Proxy;
 /// </remarks>
 public class GameplaySessionState
 {
+    /// <summary>
+    /// Initializes session state. When <paramref name="cipherActiveFromStart"/> is
+    /// <see langword="true"/>, the session begins directly in <see cref="SessionPhase.Gameplay"/>
+    /// — used for connections whose cipher is live from the first byte with no DH handshake to
+    /// skip (e.g. the CO 7xxx Auth connection on port 80). Otherwise it begins in
+    /// <see cref="SessionPhase.Handshake"/> and decrypts only after the handshake completes.
+    /// </summary>
+    /// <param name="cipherActiveFromStart">Whether the cipher is active from byte 0.</param>
+    public GameplaySessionState(bool cipherActiveFromStart = false)
+    {
+        Phase = cipherActiveFromStart ? SessionPhase.Gameplay : SessionPhase.Handshake;
+    }
+
     /// <summary>Gets or sets the current phase of this session.</summary>
-    public SessionPhase Phase { get; set; } = SessionPhase.Handshake;
+    public SessionPhase Phase { get; set; }
 
     /// <summary>Number of client→server messages seen during the handshake. Transitions at 2.</summary>
     public int ClientToServerCount { get; set; } = 0;

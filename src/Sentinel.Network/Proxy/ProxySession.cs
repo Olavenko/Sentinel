@@ -7,6 +7,7 @@ using Sentinel.Core.Interfaces;
 using Sentinel.Crypto;
 using Sentinel.Crypto.Interfaces;
 using Sentinel.Network.Handshake;
+using Sentinel.Network.Keys;
 
 namespace Sentinel.Network.Proxy;
 
@@ -25,10 +26,16 @@ public sealed class ProxySession : IProxySession
     private readonly string _endpointName;
     private readonly bool _enableMitm;
     private readonly bool _enableGameplayDecrypt;
+    private readonly bool _cipherActiveFromStart;
+    private readonly bool _enableCast5GameplayDecrypt;
     private readonly Func<bool, ICipher>? _handshakeCipherFactory;
+    private readonly IGameSessionKeyProvider? _gameKeyProvider;
 
     // Read-only gameplay decryption state (null when not in this mode)
     private GameplaySessionState? _gameplayState;
+
+    // Read-only port-19000 CAST5-variant decryption state (null when not in this mode)
+    private Cast5GameplayState? _cast5State;
 
     private long _bytesToServer;
     private long _bytesToClient;
@@ -61,7 +68,10 @@ public sealed class ProxySession : IProxySession
         string endpointName,
         bool enableMitm = false,
         Func<bool, ICipher>? handshakeCipherFactory = null,
-        bool enableGameplayDecrypt = false)
+        bool enableGameplayDecrypt = false,
+        bool cipherActiveFromStart = false,
+        bool enableCast5GameplayDecrypt = false,
+        IGameSessionKeyProvider? gameKeyProvider = null)
     {
         _client = client;
         _server = server;
@@ -71,6 +81,9 @@ public sealed class ProxySession : IProxySession
         _enableMitm = enableMitm;
         _handshakeCipherFactory = handshakeCipherFactory;
         _enableGameplayDecrypt = enableGameplayDecrypt;
+        _cipherActiveFromStart = cipherActiveFromStart;
+        _enableCast5GameplayDecrypt = enableCast5GameplayDecrypt;
+        _gameKeyProvider = gameKeyProvider;
     }
 
     public async Task RunAsync(CancellationToken cancellationToken = default)
@@ -104,7 +117,12 @@ public sealed class ProxySession : IProxySession
 
             // Initialise read-only gameplay decryption (only when MITM is not active)
             if (_enableGameplayDecrypt && !_enableMitm)
-                _gameplayState = new GameplaySessionState();
+                _gameplayState = new GameplaySessionState(_cipherActiveFromStart);
+
+            // Initialise read-only CAST5-variant decryption (port 19000, keyfeed-seeded)
+            if (_enableCast5GameplayDecrypt && !_enableMitm && _gameKeyProvider is not null)
+                _cast5State = new Cast5GameplayState(
+                    _gameKeyProvider, _logger, _endpointName, Id.ToString()[..8]);
 
             var clientToServer = ForwardAsync(
                 clientStream, serverStream,
@@ -142,6 +160,7 @@ public sealed class ProxySession : IProxySession
         {
             _isActive = false;
             DisposeCiphers();
+            _cast5State?.Dispose();
             await _packetLogger.FlushAsync();
             Disconnected?.Invoke(this, disconnectReason);
         }
@@ -309,6 +328,28 @@ public sealed class ProxySession : IProxySession
                             // Always forward the original encrypted segment
                             await destination.WriteAsync(segment, ct);
                         }
+                        else if (_cast5State is not null)
+                        {
+                            // Read-only CAST5 gameplay decrypt (port 19000):
+                            // forward the original encrypted bytes untouched; decrypt a
+                            // buffered copy for logging only (seeded from the keyfeed).
+                            await destination.WriteAsync(segment, ct);
+
+                            var plaintext = _cast5State.OnChunk(direction, segment.Span);
+                            if (plaintext is { Length: > 0 })
+                            {
+                                try
+                                {
+                                    await _packetLogger.LogPacketAsync(Id, direction, plaintext, timestamp);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarning(ex,
+                                        "[{Endpoint}] {Dir} CAST5 plaintext logging failed ({Bytes} bytes)",
+                                        _endpointName, dirLabel, plaintext.Length);
+                                }
+                            }
+                        }
                         else
                         {
                             // Transparent mode: log raw → forward
@@ -382,6 +423,7 @@ public sealed class ProxySession : IProxySession
         _server.Dispose();
 
         DisposeCiphers();
+        _cast5State?.Dispose();
         await _packetLogger.FlushAsync();
     }
 }

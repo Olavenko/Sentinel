@@ -61,6 +61,8 @@ The Core, Crypto, Network, and GameState layers have NO dependency on any UI fra
 ### 2. ICipher Abstraction
 Encryption algorithm is unknown until reverse engineering is complete. All crypto goes behind `ICipher` and `IKeyExchange` interfaces. The proxy doesn't care if it's Blowfish, RC5, AES, or something custom — it calls `Encrypt()`/`Decrypt()` and the implementation handles the rest.
 
+> **RE update (2026-06-27) — ciphers identified.** **Port 80 (auth / version-check):** custom dual-table cipher (XOR + nibble-swap), static hardcoded tables — implemented as `ConquerCipher`. **Port 19000 (game server):** TQ-customized **CAST5 (CAST-128) CFB64** — RFC-2144 CAST5 S-box *values* + CAST5 round structure, with a **−1 S-box index offset** so it is *not* stock CAST5 (BouncyCastle/OpenSSL CAST5 won't decrypt directly). Key functions: CFB64 driver `FUN_01254810` @ `0x01254810`, CAST5 block `FUN_01266300` @ `0x01266300`, S-boxes base `0x0171E034` (from `0x0171E030`, −1 offset). The existing `BlowfishCfb64Cipher.cs` placeholder is **misnamed** (cipher is CAST5-variant, not Blowfish) — rename pending in a separate code task. Full canonical finding + proof: see `ROADMAP.md`.
+
 ### 3. Observable Game State (Phase 4+)
 `GameSession` will hold all game state and emit C# events on changes. Plugins and UI subscribe to events — they never poll or access networking directly.
 

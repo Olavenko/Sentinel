@@ -6,6 +6,7 @@ using Sentinel.Core.Interfaces;
 using Sentinel.Core.Models;
 using Sentinel.Crypto;
 using Sentinel.Crypto.Interfaces;
+using Sentinel.Network.Keys;
 
 namespace Sentinel.Network.Proxy;
 
@@ -20,6 +21,7 @@ public sealed class ProxyServer : IProxyServer
     private readonly ILogger<ProxySession> _sessionLogger;
     private readonly ILogger<ProxyServer> _logger;
     private readonly Func<bool, ICipher>? _handshakeCipherFactory;
+    private readonly IGameSessionKeyProvider? _gameKeyProvider;
 
     private readonly ConcurrentDictionary<Guid, IProxySession> _sessions = new();
     private TcpListener? _listener;
@@ -35,13 +37,15 @@ public sealed class ProxyServer : IProxyServer
         IPacketLogger packetLogger,
         ILogger<ProxySession> sessionLogger,
         ILogger<ProxyServer> logger,
-        Func<bool, ICipher>? handshakeCipherFactory = null)
+        Func<bool, ICipher>? handshakeCipherFactory = null,
+        IGameSessionKeyProvider? gameKeyProvider = null)
     {
         _config = config;
         _packetLogger = packetLogger;
         _sessionLogger = sessionLogger;
         _logger = logger;
         _handshakeCipherFactory = handshakeCipherFactory;
+        _gameKeyProvider = gameKeyProvider;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -91,7 +95,8 @@ public sealed class ProxyServer : IProxyServer
             session = new ProxySession(
                 client, server, _packetLogger, _sessionLogger,
                 _config.Name, _config.EnableMitm, _handshakeCipherFactory,
-                _config.EnableGameplayDecrypt);
+                _config.EnableGameplayDecrypt, _config.CipherActiveFromStart,
+                _config.EnableCast5GameplayDecrypt, _gameKeyProvider);
 
             _sessions.TryAdd(session.Id, session);
             SessionStarted?.Invoke(session);

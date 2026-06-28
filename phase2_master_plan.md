@@ -3,6 +3,8 @@
 ### Objective
 Identify the real runtime encryption path used by the client, determine where the active cipher context is created and initialized, validate whether the game cipher key is static or derived, and extract either the raw key material or a reusable expanded context for MITM integration.
 
+> **CORRECTION (2026-06-27):** Where this plan refers to `BF_cfb64_encrypt` / Blowfish as the port-19000 game cipher, the actual cipher is a **TQ-customized CAST5 (CAST-128) CFB64** (RFC-2144 CAST5 S-boxes + round structure with a −1 S-box index offset → not stock CAST5). Real functions: CFB64 driver `FUN_01254810` @ `0x01254810`, CAST5 block `FUN_01266300` @ `0x01266300`, S-boxes base `0x0171E034` (from `0x0171E030`). See `ROADMAP.md` for the canonical finding.
+
 ---
 
 ## Stage 1 — Confirm the Runtime Encryption Boundary

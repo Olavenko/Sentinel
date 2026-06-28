@@ -3,6 +3,8 @@
 **Status:** IN PROGRESS
 **Goal:** Fully understand the encryption system and extract the key with zero guesswork.
 
+> **CORRECTION (2026-06-27):** The port-19000 cipher referenced throughout as "Blowfish" / `BF_cfb64_encrypt` (`0x012410f0`) is actually a **TQ-customized CAST5 (CAST-128) CFB64**. The "custom 64-bit block cipher in CFB64 mode" characterization is correct; the "Blowfish" / `BF_*` naming and the `0x012410f0` address are wrong. Corrected addresses: CFB64 driver `FUN_01254810` @ `0x01254810`, CAST5 block `FUN_01266300` @ `0x01266300`, S-boxes base `0x0171E034` (read from `0x0171E030`, −1 offset). The `P[0]=0xdb298a75` constant was a CAST5 subkey, not a Blowfish P-array entry. Canonical finding + proof: `ROADMAP.md`.
+
 ---
 
 ## Checklist
