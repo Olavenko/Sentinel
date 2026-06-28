@@ -49,3 +49,9 @@ $RECYCLE.BIN/
 
 # macOS
 .DS_Store
+
+# Local .NET SDK install + first-run / tool-path markers (e.g. .dotnet/.dotnet/*.sentinel)
+.dotnet/
+
+# Capture / debug logs (Frida keyfeed + capture logs, etc.) — never commit
+*.log
