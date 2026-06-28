@@ -74,10 +74,13 @@ public sealed class ProxyConfiguration
     public string HandshakeChainTablePath { get; set; } = "resources/handshake-chain-table.json";
 
     /// <summary>
-    /// Path to the live Frida keyfeed file for the port-19000 CAST5-variant gameplay cipher
-    /// (written by <c>tools/frida_v22_keyfeed.js</c>). Consumed by endpoints with
+    /// Path used to locate the <c>keys\</c> directory for the port-19000 CAST5-variant
+    /// gameplay cipher keyfeed files (written per-PID as <c>game-session-&lt;pid&gt;.key.json</c>
+    /// by <c>tools/frida_v22_keyfeed.js</c>). Consumed by endpoints with
     /// <see cref="ProxyEndpointConfig.EnableCast5GameplayDecrypt"/> set. Absolute, or relative
-    /// to the application base directory. The file is watched and reloaded on each new session.
+    /// to the application base directory. Only the DIRECTORY of this path is used: the whole
+    /// directory is watched for <c>game-session-*.key.json</c> files (one per game client), and
+    /// each is reloaded on change so several accounts can be active at once.
     /// </summary>
     public string GameSessionKeyPath { get; set; } = "keys/game-session.key.json";
 
