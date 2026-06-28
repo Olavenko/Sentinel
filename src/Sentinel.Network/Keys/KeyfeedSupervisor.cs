@@ -88,6 +88,7 @@ public sealed class KeyfeedSupervisor : IDisposable
         try
         {
             TickSafely();
+            LogArmedSummary(); // first-tick result: confirm the pipeline armed (nothing else opens)
             while (await timer.WaitForNextTickAsync(ct))
                 TickSafely();
         }
@@ -95,6 +96,31 @@ public sealed class KeyfeedSupervisor : IDisposable
         {
             // Normal shutdown — children are killed in Dispose.
         }
+    }
+
+    /// <summary>
+    /// After the first reconcile, log one clear line stating the supervisor armed and how many game
+    /// processes it found / children it spawned. With AutoSpawn ON the operator starts nothing else,
+    /// so this is their confirmation the keyfeed pipeline is live (and the per-spawn lines that follow
+    /// report any client that attaches later).
+    /// </summary>
+    private void LogArmedSummary()
+    {
+        int found, spawned;
+        lock (_gate)
+        {
+            found = _children.Count;
+            spawned = _children.Values.Count(c => c.Process is not null);
+        }
+
+        if (found == 0)
+            _logger.LogInformation(
+                "Keyfeed supervisor ON — 0 '{Process}' process(es) found; it will attach automatically when a client launches.",
+                _processBaseName);
+        else
+            _logger.LogInformation(
+                "Keyfeed supervisor ON — {Found} '{Process}' process(es) found, {Spawned} Frida child(ren) spawned.",
+                found, _processBaseName, spawned);
     }
 
     /// <summary>

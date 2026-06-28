@@ -112,12 +112,13 @@ public sealed class ProxyConfiguration
 public sealed class KeyfeedConfig
 {
     /// <summary>
-    /// Whether the proxy auto-spawns the Frida keyfeed per game client. Default <see langword="false"/>:
-    /// while this is off, the operator must produce <c>game-session-&lt;pid&gt;.key.json</c> files by
-    /// running <c>tools/frida_v22_keyfeed.js</c> manually, and the proxy warns loudly at startup if
-    /// none are present.
+    /// Whether the proxy auto-spawns the Frida keyfeed per game client. Default <see langword="true"/>:
+    /// starting the proxy with CAST5 gameplay decrypt enabled also arms the keyfeed supervisor, so the
+    /// operator runs the proxy and nothing else. Set to <see langword="false"/> to instead produce
+    /// <c>game-session-&lt;pid&gt;.key.json</c> files manually (via <c>tools/frida_v22_keyfeed.js</c>);
+    /// the proxy then warns loudly at startup if none are present.
     /// </summary>
-    public bool AutoSpawn { get; set; }
+    public bool AutoSpawn { get; set; } = true;
 
     /// <summary>Path to the Frida CLI executable. May be a bare name resolved via PATH (e.g. "frida")
     /// or an absolute path. Default "frida".</summary>

@@ -50,9 +50,10 @@ public sealed class ProxyHost : IAsyncDisposable
             ? new GameSessionKeyProvider(cfg.GameSessionKeyPath, keyLogger)
             : null;
 
-        // Proxy-only key production: when AutoSpawn is on, the supervisor attaches the Frida keyfeed
-        // to each game client itself. Default OFF — until it is enabled, keys must be produced
-        // manually, so warn loudly if CAST5 decrypt is on but no key files are present.
+        // Proxy-only key production: when AutoSpawn is on (the default), the supervisor attaches the
+        // Frida keyfeed to each game client itself, so the operator starts nothing else. If it is
+        // turned OFF, keys must be produced manually — so warn loudly when CAST5 decrypt is on but no
+        // key files are present.
         if (cast5Enabled && cfg.Keyfeed.AutoSpawn)
         {
             _supervisor = new KeyfeedSupervisor(cfg.Keyfeed, _keyProvider!.KeysDirectory, keyfeedLogger);
